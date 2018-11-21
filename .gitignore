@@ -1,0 +1,6 @@
+*.exe
+*.pyc
+Lib
+dist
+*.egg-info
+build.
