@@ -230,12 +230,12 @@ def CatalogSignWithSignTool(SignToolPath, ToSignFilePath, PfxFilePath, PfxPass=N
     OutputDir = os.path.dirname(ToSignFilePath)
     #Signtool docs https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
     #todo: link to catalog signing documentation
-    cmd = SignToolPath + " sign /a /fd SHA256 /f " + PfxFilePath
+    params = "sign /a /fd SHA256 /f " + PfxFilePath
     if PfxPass is not None:
         #add password if set
-        cmd = cmd + ' /p ' + PfxPass
-    cmd = cmd + ' /debug /v "' + ToSignFilePath + '" '
-    ret = RunCmd(cmd, workingdir=OutputDir)
+        params = params + ' /p ' + PfxPass
+    params = params + ' /debug /v "' + ToSignFilePath + '" '
+    ret = RunCmd(SignToolPath, params, workingdir=OutputDir)
     if(ret != 0):
         logging.error("Signtool failed %d" % ret)
     return ret

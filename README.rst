@@ -10,6 +10,11 @@ Python files describing various miscellaneous components from the TPM and EDKII 
 Version History
 ===============
 
+0.2.2
+-----------------
+
+Fixing CatalogSignWithSignTool to use new RunCmd format
+
 0.2.1
 -----------------
 
