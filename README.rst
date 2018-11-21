@@ -10,6 +10,11 @@ Python files describing various miscellaneous components from the TPM and EDKII 
 Version History
 ===============
 
+0.2.3
+-----------------
+
+Conditionally adding quotes instead of automatically in RunCmd and RunPythonScript
+
 0.2.2
 -----------------
 

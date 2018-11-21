@@ -113,7 +113,9 @@ def GetNugetCmd():
 # @return returncode of called cmd
 ####
 def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstream=None):
-    cmd = '"' + cmd.strip('"\'') + '"'
+    cmd = cmd.strip('"\'')
+    if " " in cmd:
+        cmd = '"' + cmd + '"'
     parameters = parameters.strip()
     if parameters is not None:
         cmd += " " + parameters
@@ -154,6 +156,10 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
 ####
 def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=None, outstream=None):
     #locate python file on path
+    pythonfile.strip('"\'')
+    if " " in pythonfile:
+        pythonfile = '"' + pythonfile + '"'
+    params.strip()
     logging.debug("RunPythonScript: {0} {1}".format(pythonfile, params))
     if(os.path.isabs(pythonfile)):
         logging.debug("Python Script was given as absolute path: %s" % pythonfile)
