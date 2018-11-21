@@ -37,7 +37,6 @@ setuptools.setup(
     author_email="maknutse@microsoft.com",
     description="Python files describing miscellanious components (EDKII, TPM, etc.)",
     long_description=long_description,
-    long_description_content_type="text/markdown",
     url="https://github.com/microsoft/mu_pip_python_library",
     license='BSD2',
     packages=setuptools.find_packages()
