@@ -154,8 +154,7 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
 ####
 def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=None, outstream=None):
     #locate python file on path
-    logging.debug("RunPythonScript: %s" % cmd)
-    pythonfile = os.path.normpath(cmd.split()[0])
+    logging.debug("RunPythonScript: {0} {1}".format(pythonfile, params))
     if(os.path.isabs(pythonfile)):
         logging.debug("Python Script was given as absolute path: %s" % pythonfile)
     elif(os.path.isfile(os.path.join(os.getcwd(),pythonfile))):
@@ -169,7 +168,7 @@ def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=N
                 pythonfile = os.path.join(a, pythonfile)
                 logging.debug("Python Script was found on the path: %s" % pythonfile)
                 break
-    params = pythonfile + " " + ' '.join(cmd.split()[1:])
+    params = pythonfile + " " + ' '.join(params.split())
     return RunCmd("python.exe", params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream)
 
 ####
