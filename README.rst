@@ -10,6 +10,16 @@ Python files describing various miscellaneous components from the TPM and EDKII 
 Version History
 ===============
 
+0.2.5
+-----------------
+
+Fixing parameters none check in RunCmd
+
+0.2.4
+-----------------
+
+Using sys.executable in RunPythonScript instead of "python.exe" and assuming its on the path
+
 0.2.3
 -----------------
 

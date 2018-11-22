@@ -116,8 +116,8 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
     cmd = cmd.strip('"\'')
     if " " in cmd:
         cmd = '"' + cmd + '"'
-    parameters = parameters.strip()
     if parameters is not None:
+        parameters = parameters.strip()
         cmd += " " + parameters
     starttime = datetime.datetime.now()
     logging.info("Cmd to run is: " + cmd)
