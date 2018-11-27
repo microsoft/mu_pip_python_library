@@ -174,7 +174,7 @@ def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=N
                 pythonfile = os.path.join(a, pythonfile)
                 logging.debug("Python Script was found on the path: %s" % pythonfile)
                 break
-    params = pythonfile + " " + ' '.join(params.split())
+    params = pythonfile + " " + params
     return RunCmd("python.exe", params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream)
 
 ####

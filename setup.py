@@ -32,7 +32,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="mu_python_library",
-    version="0.2.5",
+    version="0.2.6",
     author="Max Knutsen",
     author_email="maknutse@microsoft.com",
     description="Python files describing miscellanious components (EDKII, TPM, etc.)",

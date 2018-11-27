@@ -10,6 +10,11 @@ Python files describing various miscellaneous components from the TPM and EDKII 
 Version History
 ===============
 
+0.2.6
+-----------------
+
+Fixing parameter parsing in RunPythonScript to preserve formatting of parameters
+
 0.2.5
 -----------------
 
