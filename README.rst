@@ -10,6 +10,11 @@ Python files describing various miscellaneous components from the TPM and EDKII 
 Version History
 ===============
 
+0.2.8
+-----------------
+
+Adding support for environment variables dictionary to RunCmd and RunPythonScript
+
 0.2.7
 -----------------
 

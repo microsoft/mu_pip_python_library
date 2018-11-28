@@ -108,11 +108,13 @@ def GetNugetCmd():
 # @param capture - boolean to determine if caller wants the output captured in any format.
 # @param workingdir - path to set to the working directory before running the command.
 # @param outfile - capture output to file of given path.
-# @param outstream - capture output to a stream.  
+# @param outstream - capture output to a stream.
+# @param environ - shell environment variables dictionary that replaces the one inherited from the
+#                  current process.
 #
 # @return returncode of called cmd
 ####
-def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstream=None):
+def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstream=None, environ=None):
     cmd = cmd.strip('"\'')
     if " " in cmd:
         cmd = '"' + cmd + '"'
@@ -124,7 +126,7 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
     logging.info("------------------------------------------------")
     logging.info("--------------Cmd Output Starting---------------")
     logging.info("------------------------------------------------")
-    c = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=workingdir, shell=True)
+    c = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=workingdir, shell=True, env=environ)
     if(capture):
         outr = PropagatingThread(target=reader, args=(outfile, outstream, c.stdout,))
         outr.start()
@@ -150,11 +152,13 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
 # @param capture - boolean to determine if caller wants the output captured in any format.
 # @param workingdir - path to set to the working directory before running the command.
 # @param outfile - capture output to file of given path.
-# @param outstream - capture output to a stream.  
+# @param outstream - capture output to a stream.
+# @param environ - shell environment variables dictionary that replaces the one inherited from the
+#                  current process.
 #
 # @return returncode of called cmd
 ####
-def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=None, outstream=None):
+def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=None, outstream=None, environ=None):
     #locate python file on path
     pythonfile.strip('"\'')
     if " " in pythonfile:
@@ -175,8 +179,7 @@ def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=N
                 logging.debug("Python Script was found on the path: %s" % pythonfile)
                 break
     params = pythonfile + " " + params
-    return RunCmd(sys.executable, params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream)
-
+    return RunCmd(sys.executable, params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream, environ=environ)
 ####
 # Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.  
 # WARNING!!! : This should not be used for production signing as that process should follow stronger security practices (HSM / smart cards / etc)
