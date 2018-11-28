@@ -12,7 +12,7 @@ import datetime
 import shutil
 import threading
 import subprocess
-
+import sys
 
 ####
 # Helper to allow Enum type to be used which allows better code readability
@@ -175,7 +175,7 @@ def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=N
                 logging.debug("Python Script was found on the path: %s" % pythonfile)
                 break
     params = pythonfile + " " + params
-    return RunCmd("python.exe", params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream)
+    return RunCmd(sys.executable, params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream)
 
 ####
 # Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.  
