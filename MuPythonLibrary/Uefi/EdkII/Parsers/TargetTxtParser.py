@@ -1,4 +1,4 @@
-## @file TargetTxtParser.py
+# @file TargetTxtParser.py
 # Code to help parse Edk2 Conf/Target.txt file
 ##
 # Copyright (c) 2016, Microsoft Corporation
@@ -27,6 +27,7 @@
 from MuPythonLibrary.Uefi.EdkII.Parsers.BaseParser import HashFileParser
 import os
 
+
 class TargetTxtParser(HashFileParser):
 
     def __init__(self):
@@ -47,16 +48,16 @@ class TargetTxtParser(HashFileParser):
         self.Lines = f.readlines()
         f.close()
 
-        for l in self.Lines:
-            l = self.StripComment(l)
+        for line in self.Lines:
+            sline = self.StripComment(line)
 
-            if(l == None or len(l) < 1):
+            if(sline is None or len(sline) < 1):
                 continue
 
-            if l.count("=") == 1:
-                tokens = l.split('=', 1)
+            if sline.count("=") == 1:
+                tokens = sline.split('=', 1)
                 self.Dict[tokens[0].strip()] = tokens[1].strip()
-                self.Logger.debug("Key,values found:  %s = %s"%(tokens[0].strip(), tokens[1].strip()))
+                self.Logger.debug("Key,values found:  %s = %s" % (tokens[0].strip(), tokens[1].strip()))
                 continue
 
         self.Parsed = True

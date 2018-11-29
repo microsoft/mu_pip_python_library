@@ -1,4 +1,4 @@
-## @file VariableFormat_Test.py
+# @file VariableFormat_Test.py
 # Unit test harness for the VariableFormat module/classes.
 #
 ##
@@ -26,27 +26,28 @@
 ##
 
 import unittest
-import VariableFormat as VF
+import MuPythonLibrary.Uefi.EdkII.VariableFormat as VF
+
 
 class TestVariableHeader(unittest.TestCase):
 
-  def test_set_name(self):
-    var = VF.VariableHeader()
+    def test_set_name(self):
+        var = VF.VariableHeader()
 
-    test_name = "MyNewName"
-    var.set_name(test_name)
+        test_name = "MyNewName"
+        var.set_name(test_name)
 
-    self.assertEqual(var.Name, test_name)
+        self.assertEqual(var.Name, test_name)
 
-  def test_get_packed_name(self):
-    var = VF.VariableHeader()
+    def test_get_packed_name(self):
+        var = VF.VariableHeader()
 
-    test_name = "MyNewName"
-    var.set_name(test_name)
+        test_name = "MyNewName"
+        var.set_name(test_name)
 
-    test_name_packed = bytes.fromhex('4D0079004E00650077004E0061006D0065000000')
-    self.assertEqual(var.get_packed_name(), test_name_packed)
-    
+        test_name_packed = bytes.fromhex('4D0079004E00650077004E0061006D0065000000')
+        self.assertEqual(var.get_packed_name(), test_name_packed)
+
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

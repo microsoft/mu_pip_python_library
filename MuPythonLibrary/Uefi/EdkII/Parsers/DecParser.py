@@ -1,4 +1,4 @@
-## @file DecParser.py
+# @file DecParser.py
 # Code to help parse DEC file
 ##
 # Copyright (c) 2018, Microsoft Corporation
@@ -26,6 +26,7 @@
 ###
 from MuPythonLibrary.Uefi.EdkII.Parsers.BaseParser import HashFileParser
 import os
+
 
 class DecParser(HashFileParser):
     def __init__(self):
@@ -60,89 +61,88 @@ class DecParser(HashFileParser):
         InPcdSection = False
         InIncludesSection = False
 
-        for l in self.Lines:
-            l = self.StripComment(l)
+        for line in self.Lines:
+            sline = self.StripComment(line)
 
-            if(l == None or len(l) < 1):
+            if(sline is None or len(sline) < 1):
                 continue
 
             if InDefinesSection:
-                if l.strip()[0] == '[':
+                if sline.strip()[0] == '[':
                     InDefinesSection = False
                 else:
-                    if l.count("=") == 1:
-                        tokens = l.split('=', 1)
+                    if sline.count("=") == 1:
+                        tokens = sline.split('=', 1)
                         self.Dict[tokens[0].strip()] = tokens[1].strip()
                         continue
 
-
             elif InLibraryClassSection:
-                if l.strip()[0] == '[':
-                   InLibraryClassSection = False
+                if sline.strip()[0] == '[':
+                    InLibraryClassSection = False
                 else:
-                   t = l.partition("|")
-                   self.LibrariesUsed.append(t[0].strip())
-                   continue
+                    t = sline.partition("|")
+                    self.LibrariesUsed.append(t[0].strip())
+                    continue
 
             elif InProtocolsSection:
-                if l.strip()[0] == '[':
-                   InProtocolsSection = False
+                if sline.strip()[0] == '[':
+                    InProtocolsSection = False
                 else:
-                   t = l.partition("=")
-                   self.ProtocolsUsed.append(t[0].strip())
-                   continue
+                    t = sline.partition("=")
+                    self.ProtocolsUsed.append(t[0].strip())
+                    continue
 
             elif InGuidsSection:
-                if l.strip()[0] == '[':
-                   InGuidsSection = False
+                if sline.strip()[0] == '[':
+                    InGuidsSection = False
                 else:
-                   t = l.partition("=")
-                   self.GuidsUsed.append(t[0].strip())
-                   continue
+                    t = sline.partition("=")
+                    self.GuidsUsed.append(t[0].strip())
+                    continue
 
             elif InPcdSection:
-                if l.strip()[0] == '[':
-                   InPcdSection = False
+                if sline.strip()[0] == '[':
+                    InPcdSection = False
                 else:
-                   t = l.partition("|")
-                   self.PcdsUsed.append(t[0].strip())
-                   continue
+                    t = sline.partition("|")
+                    self.PcdsUsed.append(t[0].strip())
+                    continue
 
             elif InIncludesSection:
-                if l.strip()[0] == '[':
-                   InIncludesSection = False
+                if sline.strip()[0] == '[':
+                    InIncludesSection = False
                 else:
-                   self.IncludesUsed.append(l.strip())
-                   continue
+                    self.IncludesUsed.append(sline.strip())
+                    continue
 
             elif InPPISection:
-                if (l.strip()[0] == '['):
+                if (sline.strip()[0] == '['):
                     InPPISection = False
                 else:
-                    t = l.partition("=")
+                    t = sline.partition("=")
                     self.PPIsUsed.append(t[0].strip())
                     continue
 
             # check for different sections
-            if l.strip().lower().startswith('[defines'):
+            if sline.strip().lower().startswith('[defines'):
                 InDefinesSection = True
 
-            elif l.strip().lower().startswith('[libraryclasses'):
+            elif sline.strip().lower().startswith('[libraryclasses'):
                 InLibraryClassSection = True
 
-            elif l.strip().lower().startswith('[protocols'):
+            elif sline.strip().lower().startswith('[protocols'):
                 InProtocolsSection = True
 
-            elif l.strip().lower().startswith('[guids'):
+            elif sline.strip().lower().startswith('[guids'):
                 InGuidsSection = True
 
-            elif l.strip().lower().startswith('[ppis'):
+            elif sline.strip().lower().startswith('[ppis'):
                 InPPISection = True
 
-            elif l.strip().lower().startswith('[pcd'):
+            elif sline.strip().lower().startswith('[pcd'):
                 InPcdSection = True
 
-            elif l.strip().lower().startswith('[includes'):
+            elif sline.strip().lower().startswith('[includes'):
                 InIncludesSection = True
 
         self.Parsed = True

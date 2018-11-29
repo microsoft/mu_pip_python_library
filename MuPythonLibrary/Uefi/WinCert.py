@@ -1,4 +1,4 @@
-﻿## @file WinCert.py
+﻿# @file WinCert.py
 # Code to work with UEFI WinCert data
 ##
 # Copyright (c) 2015, Microsoft Corporation
@@ -28,14 +28,15 @@
 
 import struct
 import uuid
-from MuPythonLibrary.UtilityFunctions import *  #for printing buffer
+from MuPythonLibrary.UtilityFunctions import PrintByteList
+
 
 class WinCertPkcs1(object):
-    STATIC_STRUCT_SIZE= (4 + 2 + 2 + 16)
-    EFI_HASH_SHA256 = uuid.UUID("{51AA59DE-FDF2-4EA3-BC63-875FB7842EE9}")  #EFI_HASH_SHA256 guid defined by UEFI spec
+    STATIC_STRUCT_SIZE = (4 + 2 + 2 + 16)
+    EFI_HASH_SHA256 = uuid.UUID("{51AA59DE-FDF2-4EA3-BC63-875FB7842EE9}")  # EFI_HASH_SHA256 guid defined by UEFI spec
 
     def __init__(self, filestream=None):
-        if(filestream == None):
+        if(filestream is None):
             self.Hdr_dwLength = WinCertPkcs1.STATIC_STRUCT_SIZE
             self.Hdr_wRevision = WinCert.REVISION
             self.Hdr_wCertificateType = WinCert.WIN_CERT_TYPE_EFI_PKCS115
@@ -45,28 +46,29 @@ class WinCertPkcs1(object):
             self.PopulateFromFileStream(filestream)
 
     def AddCertData(self, fs):
-        if(self.CertData != None):
+        if(self.CertData is not None):
             raise Exception("Cert Data not 0")
-        if(self.HashAlgorithm == None):
+        if(self.HashAlgorithm is None):
             raise Exception("You must set the Hash Algorithm first")
         self.CertData = fs.read()
         self.Hdr_dwLength = self.Hdr_dwLength + len(self.CertData)
     #
     # Method to un-serialize from a filestream
     #
+
     def PopulateFromFileStream(self, fs):
-        if(fs == None):
+        if(fs is None):
             raise Exception("Invalid File stream")
 
-        #only populate from file stream those parts that are complete in the file stream
+        # only populate from file stream those parts that are complete in the file stream
         offset = fs.tell()
-        fs.seek(0,2)
+        fs.seek(0, 2)
         end = fs.tell()
         fs.seek(offset)
 
-        if((end - offset) < WinCertPkcs1.STATIC_STRUCT_SIZE): #size of the static header data
+        if((end - offset) < WinCertPkcs1.STATIC_STRUCT_SIZE):  # size of the static header data
             raise Exception("Invalid file stream size")
-        
+
         self.Hdr_dwLength = struct.unpack("=I", fs.read(4))[0]
         self.Hdr_wRevision = struct.unpack("=H", fs.read(2))[0]
         self.Hdr_wCertificateType = struct.unpack("=H", fs.read(2))[0]
@@ -90,7 +92,6 @@ class WinCertPkcs1(object):
         print("  CertData:             ")
         cdl = self.CertData.tolist()
         PrintByteList(cdl)
-        
 
     def Write(self, fs):
         fs.write(struct.pack("=I", self.Hdr_dwLength))
@@ -100,14 +101,16 @@ class WinCertPkcs1(object):
         fs.write(self.CertData)
 
 ##
-## WIN_CERT_UEFI_GUID
+# WIN_CERT_UEFI_GUID
 ##
+
+
 class WinCertUefiGuid(object):
-    STATIC_STRUCT_SIZE= (4 + 2 + 2 + 16)
-    PKCS7Guid = uuid.UUID("{4aafd29d-68df-49ee-8aa9-347d375665a7}")  #PKCS7 guid defined by UEFI spec
+    STATIC_STRUCT_SIZE = (4 + 2 + 2 + 16)
+    PKCS7Guid = uuid.UUID("{4aafd29d-68df-49ee-8aa9-347d375665a7}")  # PKCS7 guid defined by UEFI spec
 
     def __init__(self, filestream=None):
-        if(filestream == None):
+        if(filestream is None):
             self.Hdr_dwLength = WinCertUefiGuid.STATIC_STRUCT_SIZE
             self.Hdr_wRevision = WinCert.REVISION
             self.Hdr_wCertificateType = WinCert.WIN_CERT_TYPE_EFI_GUID
@@ -117,26 +120,27 @@ class WinCertUefiGuid(object):
             self.PopulateFromFileStream(filestream)
 
     def AddCertData(self, fs):
-        if(self.CertData != None):
+        if(self.CertData is not None):
             raise Exception("Cert Data not 0")
         self.CertData = memoryview(fs.read())
         self.Hdr_dwLength = self.Hdr_dwLength + len(self.CertData)
     #
     # Method to un-serialize from a filestream
     #
+
     def PopulateFromFileStream(self, fs):
-        if(fs == None):
+        if(fs is None):
             raise Exception("Invalid File stream")
 
-        #only populate from file stream those parts that are complete in the file stream
+        # only populate from file stream those parts that are complete in the file stream
         offset = fs.tell()
-        fs.seek(0,2)
+        fs.seek(0, 2)
         end = fs.tell()
         fs.seek(offset)
 
-        if((end - offset) < WinCertUefiGuid.STATIC_STRUCT_SIZE): #size of the static header data
+        if((end - offset) < WinCertUefiGuid.STATIC_STRUCT_SIZE):  # size of the static header data
             raise Exception("Invalid file stream size")
-        
+
         self.Hdr_dwLength = struct.unpack("=I", fs.read(4))[0]
         self.Hdr_wRevision = struct.unpack("=H", fs.read(2))[0]
         self.Hdr_wCertificateType = struct.unpack("=H", fs.read(2))[0]
@@ -160,7 +164,6 @@ class WinCertUefiGuid(object):
         print("  CertData:             ")
         cdl = self.CertData.tolist()
         PrintByteList(cdl)
-        
 
     def Write(self, fs):
         fs.write(struct.pack("=I", self.Hdr_dwLength))
@@ -171,36 +174,36 @@ class WinCertUefiGuid(object):
 
 
 class WinCert(object):
-    STATIC_STRUCT_SIZE= 8
+    STATIC_STRUCT_SIZE = 8
     # WIN_CERTIFICATE.wCertificateTypes UEFI Spec defined
-    WIN_CERT_TYPE_NONE             = 0x0000
+    WIN_CERT_TYPE_NONE = 0x0000
     WIN_CERT_TYPE_PKCS_SIGNED_DATA = 0x0002
-    WIN_CERT_TYPE_EFI_PKCS115      = 0x0EF0
-    WIN_CERT_TYPE_EFI_GUID         = 0x0EF1
+    WIN_CERT_TYPE_EFI_PKCS115 = 0x0EF0
+    WIN_CERT_TYPE_EFI_GUID = 0x0EF1
     # Revision
-    REVISION                       = 0x200
+    REVISION = 0x200
 
     #
-    #this method is a factory 
+    # this method is a factory
     #
     @staticmethod
     def Factory(fs):
-        if(fs == None):
+        if(fs is None):
             raise Exception("Invalid File stream")
 
-        #only populate from file stream those parts that are complete in the file stream
+        # only populate from file stream those parts that are complete in the file stream
         offset = fs.tell()
-        fs.seek(0,2)
+        fs.seek(0, 2)
         end = fs.tell()
         fs.seek(offset)
 
-        if((end - offset) < WinCert.STATIC_STRUCT_SIZE): #size of the static header data
+        if((end - offset) < WinCert.STATIC_STRUCT_SIZE):  # size of the static header data
             raise Exception("Invalid file stream size")
         # 1 read len
         # 2 read revision
         # 3 read cert type
-        Hdr_dwLength = struct.unpack("=I", fs.read(4))[0]
-        Hdr_wRevision = struct.unpack("=H", fs.read(2))[0]
+        fs.seek(4, 1)  # seeking past Hdr_dwLength
+        fs.seek(2, 1)  # seeking past Hdr_wRevision
         Hdr_wCertificateType = struct.unpack("=H", fs.read(2))[0]
 
         fs.seek(offset)

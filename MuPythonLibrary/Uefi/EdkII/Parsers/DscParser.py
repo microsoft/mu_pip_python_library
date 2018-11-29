@@ -1,4 +1,4 @@
-## @file DscParser.py
+# @file DscParser.py
 # Code to help parse DSC files
 ##
 # Copyright (c) 2016, Microsoft Corporation
@@ -27,6 +27,7 @@
 from MuPythonLibrary.Uefi.EdkII.Parsers.BaseParser import HashFileParser
 import os
 
+
 class DscParser(HashFileParser):
 
     def __init__(self):
@@ -40,26 +41,26 @@ class DscParser(HashFileParser):
         self.Pcds = []
 
     def __ParseLine(self, Line):
-        l = self.StripComment(Line).strip()
-        if(len(l) < 1):
+        line_stripped = self.StripComment(Line).strip()
+        if(len(line_stripped) < 1):
             return ("", [])
 
-        li = self.ReplaceVariables(l)
-        if(self.ProcessConditional(li)):
-            #was a conditional
-            ## Other parser returns li, [].  Need to figure out which is right
+        line_resolved = self.ReplaceVariables(line_stripped)
+        if(self.ProcessConditional(line_resolved)):
+            # was a conditional
+            # Other parser returns line_resolved, [].  Need to figure out which is right
             return ("", [])
-        
-        #not conditional keep procesing
 
-        #check if conditional is active
+        # not conditional keep procesing
+
+        # check if conditional is active
         if(not self.InActiveCode()):
             return ("", [])
 
-        #check for include file and import lines from file
-        if(li.strip().lower().startswith("!include")):
-            #include line.
-            toks= li.split()
+        # check for include file and import lines from file
+        if(line_resolved.strip().lower().startswith("!include")):
+            # include line.
+            toks = line_resolved.split()
             self.Logger.debug("Opening Include File %s" % os.path.join(self.RootPath, toks[1]))
             sp = self.FindPath(toks[1])
             lf = open(sp, "r")
@@ -67,122 +68,122 @@ class DscParser(HashFileParser):
             lf.close()
             return ("", loc)
 
-        #check for new section
-        (IsNew, Section) = self.ParseNewSection(li)
+        # check for new section
+        (IsNew, Section) = self.ParseNewSection(line_resolved)
         if(IsNew):
             self.CurrentSection = Section.upper()
             self.Logger.debug("New Section: %s" % self.CurrentSection)
             self.Logger.debug("FullSection: %s" % self.CurrentFullSection)
-            return (li, [])
+            return (line_resolved, [])
 
-        #process line in x64 components    
+        # process line in x64 components
         if(self.CurrentFullSection.upper() == "COMPONENTS.X64"):
             if(self.ParsingInBuildOption > 0):
-                if(".inf" in li.lower()):
-                    p = self.ParseInfPathLib(li)
+                if(".inf" in line_resolved.lower()):
+                    p = self.ParseInfPathLib(line_resolved)
                     self.Libs.append(p)
                     self.Logger.debug("Found Library in a 64bit BuildOptions Section: %s" % p)
-                elif("tokenspaceguid" in li.lower() and (li.count('|') > 0) and (li.count('.') > 0) ):
-                    #should be a pcd statement
-                    p = li.partition('|')
+                elif("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+                    # should be a pcd statement
+                    p = line_resolved.partition('|')
                     self.Pcds.append(p[0].strip())
                     self.Logger.debug("Found a Pcd in a 64bit Module Override section: %s" % p[0].strip())
             else:
-                if(".inf" in li.lower()):
-                    p = self.ParseInfPathMod(li)
+                if(".inf" in line_resolved.lower()):
+                    p = self.ParseInfPathMod(line_resolved)
                     self.SixMods.append(p)
                     self.Logger.debug("Found 64bit Module: %s" % p)
-                    
-            self.ParsingInBuildOption = self.ParsingInBuildOption + li.count("{")
-            self.ParsingInBuildOption = self.ParsingInBuildOption - li.count("}")
-            return (li, [])
 
-        #process line in ia32 components
+            self.ParsingInBuildOption = self.ParsingInBuildOption + line_resolved.count("{")
+            self.ParsingInBuildOption = self.ParsingInBuildOption - line_resolved.count("}")
+            return (line_resolved, [])
+
+        # process line in ia32 components
         elif(self.CurrentFullSection.upper() == "COMPONENTS.IA32"):
-            if(self.ParsingInBuildOption > 0):               
-                if(".inf" in li.lower()):
-                    p = self.ParseInfPathLib(li)
+            if(self.ParsingInBuildOption > 0):
+                if(".inf" in line_resolved.lower()):
+                    p = self.ParseInfPathLib(line_resolved)
                     self.Libs.append(p)
                     self.Logger.debug("Found Library in a 32bit BuildOptions Section: %s" % p)
-                elif("tokenspaceguid" in li.lower() and (li.count('|') > 0) and (li.count('.') > 0) ):
-                    #should be a pcd statement
-                    p = li.partition('|')
+                elif("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+                    # should be a pcd statement
+                    p = line_resolved.partition('|')
                     self.Pcds.append(p[0].strip())
                     self.Logger.debug("Found a Pcd in a 32bit Module Override section: %s" % p[0].strip())
 
             else:
-                if(".inf" in li.lower()):
-                    p = self.ParseInfPathMod(li)
+                if(".inf" in line_resolved.lower()):
+                    p = self.ParseInfPathMod(line_resolved)
                     self.ThreeMods.append(p)
                     self.Logger.debug("Found 32bit Module: %s" % p)
-                    
-            self.ParsingInBuildOption = self.ParsingInBuildOption + li.count("{")
-            self.ParsingInBuildOption = self.ParsingInBuildOption - li.count("}")
-            return (li, [])
 
-         #process line in other components
+            self.ParsingInBuildOption = self.ParsingInBuildOption + line_resolved.count("{")
+            self.ParsingInBuildOption = self.ParsingInBuildOption - line_resolved.count("}")
+            return (line_resolved, [])
+
+        # process line in other components
         elif("COMPONENTS" in self.CurrentFullSection.upper()):
-            if(self.ParsingInBuildOption > 0):               
-                if(".inf" in li.lower()):
-                    p = self.ParseInfPathLib(li)
+            if(self.ParsingInBuildOption > 0):
+                if(".inf" in line_resolved.lower()):
+                    p = self.ParseInfPathLib(line_resolved)
                     self.Libs.append(p)
                     self.Logger.debug("Found Library in a BuildOptions Section: %s" % p)
-                elif("tokenspaceguid" in li.lower() and (li.count('|') > 0) and (li.count('.') > 0) ):
-                    #should be a pcd statement
-                    p = li.partition('|')
+                elif("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+                    # should be a pcd statement
+                    p = line_resolved.partition('|')
                     self.Pcds.append(p[0].strip())
                     self.Logger.debug("Found a Pcd in a Module Override section: %s" % p[0].strip())
 
             else:
-                if(".inf" in li.lower()):
-                    p = self.ParseInfPathMod(li)
+                if(".inf" in line_resolved.lower()):
+                    p = self.ParseInfPathMod(line_resolved)
                     self.OtherMods.append(p)
                     self.Logger.debug("Found Module: %s" % p)
-                    
-            self.ParsingInBuildOption = self.ParsingInBuildOption + li.count("{")
-            self.ParsingInBuildOption = self.ParsingInBuildOption - li.count("}")
-            return (li, [])
 
-        #process line in library class section (don't use full name)
+            self.ParsingInBuildOption = self.ParsingInBuildOption + line_resolved.count("{")
+            self.ParsingInBuildOption = self.ParsingInBuildOption - line_resolved.count("}")
+            return (line_resolved, [])
+
+        # process line in library class section (don't use full name)
         elif(self.CurrentSection.upper() == "LIBRARYCLASSES"):
-            if(".inf" in li.lower()):
-                p = self.ParseInfPathLib(li)
+            if(".inf" in line_resolved.lower()):
+                p = self.ParseInfPathLib(line_resolved)
                 self.Libs.append(p)
                 self.Logger.debug("Found Library in Library Class Section: %s" % p)
-            return (li, [])
-        #process line in PCD section
+            return (line_resolved, [])
+        # process line in PCD section
         elif(self.CurrentSection.upper().startswith("PCDS")):
-            if("tokenspaceguid" in li.lower() and (li.count('|') > 0) and (li.count('.') > 0) ):
-                #should be a pcd statement
-                p = li.partition('|')
+            if("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+                # should be a pcd statement
+                p = line_resolved.partition('|')
                 self.Pcds.append(p[0].strip())
                 self.Logger.debug("Found a Pcd in a PCD section: %s" % p[0].strip())
-            return (li, [])                      
+            return (line_resolved, [])
         else:
-            return (li, [])
+            return (line_resolved, [])
 
     def __ParseDefineLine(self, Line):
-        l = self.StripComment(Line).strip()
-        if(len(l) < 1):
+        line_stripped = self.StripComment(Line).strip()
+        if(len(line_stripped) < 1):
             return ("", [])
 
-        #this line needs to be here to resolve any symbols inside the !include lines, if any
-        li = self.ReplaceVariables(l)
-        if(self.ProcessConditional(li)):
-            #was a conditional
-            ## Other parser returns li, [].  Need to figure out which is right
+        # this line needs to be here to resolve any symbols inside the !include lines, if any
+        line_resolved = self.ReplaceVariables(line_stripped)
+        if(self.ProcessConditional(line_resolved)):
+            # was a conditional
+            # Other parser returns line_resolved, [].  Need to figure out which is right
             return ("", [])
 
-        #not conditional keep procesing
+        # not conditional keep procesing
 
-        #check if conditional is active
+        # check if conditional is active
         if(not self.InActiveCode()):
             return ("", [])
 
-        #check for include file and import lines from file
-        if(li.strip().lower().startswith("!include")):
-            #include line.
-            toks= li.split()
+        # check for include file and import lines from file
+        if(line_resolved.strip().lower().startswith("!include")):
+            # include line.
+            toks = line_resolved.split()
             self.Logger.debug("Opening Include File %s" % os.path.join(self.RootPath, toks[1]))
             sp = self.FindPath(toks[1])
             lf = open(sp, "r")
@@ -190,18 +191,18 @@ class DscParser(HashFileParser):
             lf.close()
             return ("", loc)
 
-        #check for new section
-        (IsNew, Section) = self.ParseNewSection(li)
+        # check for new section
+        (IsNew, Section) = self.ParseNewSection(line_resolved)
         if(IsNew):
             self.CurrentSection = Section.upper()
             self.Logger.debug("New Section: %s" % self.CurrentSection)
             self.Logger.debug("FullSection: %s" % self.CurrentFullSection)
-            return (li, [])
+            return (line_resolved, [])
 
-        #process line based on section we are in
+        # process line based on section we are in
         if(self.CurrentSection == "DEFINES") or (self.CurrentSection == "BUILDOPTIONS"):
-            if li.count("=") >= 1:
-                tokens = li.split("=", 1)
+            if line_resolved.count("=") >= 1:
+                tokens = line_resolved.split("=", 1)
                 leftside = tokens[0].split()
                 if(len(leftside) == 2):
                     left = leftside[1]
@@ -210,29 +211,28 @@ class DscParser(HashFileParser):
                 right = tokens[1].strip()
 
                 self.LocalVars[left] = right
-                self.Logger.debug("Key,values found:  %s = %s"%(left, right))
+                self.Logger.debug("Key,values found:  %s = %s" % (left, right))
 
-                #iterate through the existed LocalVars and try to resolve the symbols
+                # iterate through the existed LocalVars and try to resolve the symbols
                 for var in self.LocalVars:
                     self.LocalVars[var] = self.ReplaceVariables(self.LocalVars[var])
-                return (li, [])
+                return (line_resolved, [])
         else:
-            return (li, [])
+            return (line_resolved, [])
 
     def ParseInfPathLib(self, line):
         if(line.count("|") > 0):
-            l = []
+            line_parts = []
             c = line.split("|")[0].strip()
             i = line.split("|")[1].strip()
             if(c in self.LibraryClassToInstanceDict):
-                l = self.LibraryClassToInstanceDict.get(c)
+                line_parts = self.LibraryClassToInstanceDict.get(c)
             sp = self.FindPath(i)
-            l.append(sp)
-            self.LibraryClassToInstanceDict[c] = l
+            line_parts.append(sp)
+            self.LibraryClassToInstanceDict[c] = line_parts
             return line.split("|")[1].strip()
         else:
             return line.strip().split()[0]
-        
 
     def ParseInfPathMod(self, line):
         return line.strip().split()[0].rstrip("{")
@@ -253,23 +253,23 @@ class DscParser(HashFileParser):
 
     def ResetParserState(self):
         #
-        #add more DSC parser based state reset here, if necessary
+        # add more DSC parser based state reset here, if necessary
         #
         super(DscParser, self).ResetParserState()
-            
+
     def ParseFile(self, filepath):
         self.Logger.debug("Parsing file: %s" % filepath)
         self.TargetFile = os.path.abspath(filepath)
         self.TargetFilePath = os.path.dirname(self.TargetFile)
         f = open(os.path.join(filepath), "r")
-        #expand all the lines and include other files
+        # expand all the lines and include other files
         file_lines = f.readlines()
         self.__ProcessDefines(file_lines)
-        #reset the parser state before processing more
+        # reset the parser state before processing more
         self.ResetParserState()
         self.__ProcessMore(file_lines)
         f.close()
-        self.Parsed = True        
+        self.Parsed = True
 
     def GetMods(self):
         return self.ThreeMods + self.SixMods

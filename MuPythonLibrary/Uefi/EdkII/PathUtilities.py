@@ -1,4 +1,4 @@
-## @file PathUtilities.py
+# @file PathUtilities.py
 # Code to help convert Edk2, absolute, and relative file paths
 ##
 # Copyright (c) 2018, Microsoft Corporation
@@ -32,6 +32,8 @@ import fnmatch
 # Class to help convert from absolute path to EDK2 build path
 # using workspace and packagepath variables
 #
+
+
 class Edk2Path(object):
 
     #
@@ -40,8 +42,8 @@ class Edk2Path(object):
     #
     def __init__(self, ws, packagepathlist):
         self.WorkspacePath = ws
-        if( not os.path.isabs(ws)):
-            self.WorkspacePath =  os.path.abspath(os.path.join(os.getcwd(), ws))
+        if(not os.path.isabs(ws)):
+            self.WorkspacePath = os.path.abspath(os.path.join(os.getcwd(), ws))
 
         if(not os.path.isdir(self.WorkspacePath)):
             logging.error("Workspace path invalid.  {0}".format(ws))
@@ -53,12 +55,12 @@ class Edk2Path(object):
             if(os.path.isabs(a)):
                 self.PackagePathList.append(a)
             else:
-                #see if workspace relative
+                # see if workspace relative
                 wsr = os.path.join(ws, a)
                 if(os.path.isdir(wsr)):
                     self.PackagePathList.append(wsr)
                 else:
-                    #assume current working dir relative.  Will catch invalid dir when checking whole list
+                    # assume current working dir relative.  Will catch invalid dir when checking whole list
                     self.PackagePathList.append(os.path.abspath(os.path.join(os.getcwd(), a)))
 
         error = False
@@ -67,10 +69,9 @@ class Edk2Path(object):
                 logging.error("Invalid package path entry {0}".format(a))
                 error = True
 
-        #report error
+        # report error
         if(error):
             raise Exception("Invalid package path directory(s)")
-
 
     def GetEdk2RelativePathFromAbsolutePath(self, abspath):
         relpath = None
@@ -79,8 +80,8 @@ class Edk2Path(object):
             return None
         for a in self.PackagePathList:
             stripped = abspath.lower().partition(a.lower())[2]
-            if stripped:  
-                #found our path...now lets correct for case
+            if stripped:
+                # found our path...now lets correct for case
                 relpath = abspath[len(a):]
                 found = True
                 logging.debug("Successfully converted AbsPath to Edk2Relative Path using PackagePath")
@@ -88,24 +89,24 @@ class Edk2Path(object):
                 break
 
         if(not found):
-            #try to strip the workspace
+            # try to strip the workspace
             stripped = abspath.lower().partition(self.WorkspacePath.lower())[2]
-            if stripped:  
-                #found our path...now lets correct for case
+            if stripped:
+                # found our path...now lets correct for case
                 relpath = abspath[len(self.WorkspacePath):]
                 found = True
                 logging.debug("Successfully converted AbsPath to Edk2Relative Path using WorkspacePath")
                 logging.debug("AbsolutePath: %s found in Workspace: %s" % (abspath, self.WorkspacePath))
-            
+
         if(found):
             relpath = relpath.replace(os.sep, "/")
             return relpath.lstrip("/")
 
-        #didn't find the path for conversion. 
+        # didn't find the path for conversion.
         logging.error("Failed to convert AbsPath to Edk2Relative Path")
         logging.error("AbsolutePath: %s" % abspath)
         return None
-    
+
     def GetAbsolutePathOnThisSytemFromEdk2RelativePath(self, relpath):
         relpath = relpath.replace("/", os.sep)
         abspath = os.path.join(self.WorkspacePath, relpath)
@@ -118,22 +119,22 @@ class Edk2Path(object):
                 return abspath
         logging.error("Failed to convert Edk2Relative Path to an Absolute Path on this system.")
         logging.error("Relative Path: %s" % relpath)
-        
+
         return None
 
     # Find the package this path belongs to using
-    # some Heuristic.  This isn't perfect but at least 
+    # some Heuristic.  This isn't perfect but at least
     # identifies the directory consistently
     #
     # @param InputPath:  absolute path to module
     #
-    # @ret Name of Package that the module is in. 
+    # @ret Name of Package that the module is in.
     def GetContainingPackage(self, InputPath):
         logging.debug("GetContainingPackage: %s" % InputPath)
 
         dirpathprevious = os.path.dirname(InputPath)
         dirpath = os.path.dirname(InputPath)
-        while( dirpath is not None):
+        while(dirpath is not None):
             #
             # if at the root of a packagepath return the previous dir.
             # this catches cases where a package has no DEC
@@ -167,6 +168,3 @@ class Edk2Path(object):
         logging.info("PackagePath is: %s" % os.pathsep.join(self.PackagePathList))
         logging.info("Workspace path is : %s" % self.WorkspacePath)
         return None
-
-
-        

@@ -4,3 +4,10 @@ Lib
 dist
 *.egg-info
 build.
+/cov_html
+/.pytest_cache
+/pytest_MuPythonLibrary_report.html
+/.coverage
+/cov.xml
+/test.junit.xml
+flake8.err.log

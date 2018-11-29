@@ -39,5 +39,11 @@ setuptools.setup(
     long_description=long_description,
     url="https://github.com/microsoft/mu_pip_python_library",
     license='BSD2',
-    packages=setuptools.find_packages()
+    packages=setuptools.find_packages(),
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: OS Independent",
+        "Development Status :: 3 - Alpha"
+    ]
 )

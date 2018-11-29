@@ -1,11 +1,11 @@
 ﻿#
-## Utility Functions to support re-use in python scripts.  
+# Utility Functions to support re-use in python scripts.
 ##
-## Includes functions for running external commands, etc
+# Includes functions for running external commands, etc
 ##
-## Copyright Microsoft Corporation, 2017
+# Copyright Microsoft Corporation, 2017
 ##
-from __future__ import print_function  #support Python3 and 2 for print
+from __future__ import print_function  # support Python3 and 2 for print
 import os
 import logging
 import datetime
@@ -19,13 +19,16 @@ import sys
 #
 # ref: http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python
 ####
-class Enum(tuple): __getattr__ = tuple.index
+
+
+class Enum(tuple):
+    __getattr__ = tuple.index
 
 
 ####
-# Class to support running commands from the shell in a python environment. 
-# Don't use directly.  
-# 
+# Class to support running commands from the shell in a python environment.
+# Don't use directly.
+#
 # PropagatingThread copied from sample here:
 # https://stackoverflow.com/questions/2829329/catch-a-threads-exception-in-the-caller-thread-in-python
 ####
@@ -59,7 +62,7 @@ class PropagatingThread(threading.Thread):
 ####
 def reader(filepath, outstream, stream):
     f = None
-    #open file if caller provided path
+    # open file if caller provided path
     if(filepath):
         f = open(filepath, "w")
 
@@ -68,10 +71,10 @@ def reader(filepath, outstream, stream):
         if not s:
             break
         if(f is not None):
-            #write to file if caller provided file
+            # write to file if caller provided file
             f.write(s)
         if(outstream is not None):
-            #write to stream object if caller provided object
+            # write to stream object if caller provided object
             outstream.write(s)
         logging.info(s.rstrip())
     stream.close()
@@ -85,19 +88,21 @@ def reader(filepath, outstream, stream):
 #
 # @return list containing either ["nuget.exe"] or ["mono", "/PATH/TO/nuget.exe"]
 ####
+
+
 def GetNugetCmd():
-  file = "nuget.exe"
-  cmd = []
-  if (os.name == "posix"):
-    cmd += ["mono"]
-    for env_var in os.getenv("PATH").split(os.pathsep):
-      env_var = os.path.normpath(env_var)
-      if os.path.isfile(os.path.join(env_var, file)):
-        file = "\"" + os.path.join(env_var, file) + "\""
-        logging.debug("File was found on the path: %s" % file)
-        break
-  cmd += [file]
-  return cmd
+    file = "nuget.exe"
+    cmd = []
+    if (os.name == "posix"):
+        cmd += ["mono"]
+        for env_var in os.getenv("PATH").split(os.pathsep):
+            env_var = os.path.normpath(env_var)
+            if os.path.isfile(os.path.join(env_var, file)):
+                file = "\"" + os.path.join(env_var, file) + "\""
+                logging.debug("File was found on the path: %s" % file)
+                break
+    cmd += [file]
+    return cmd
 
 
 ####
@@ -145,8 +150,8 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
 
 ####
 # Run a python script and print the output to the log file
-# This is the public function that should be used to execute python scripts from the shell in python environment. 
-# The python script will be located using the path as if it was an executable.  
+# This is the public function that should be used to execute python scripts from the shell in python environment.
+# The python script will be located using the path as if it was an executable.
 #
 # @param cmd - cmd string to run including parameters
 # @param capture - boolean to determine if caller wants the output captured in any format.
@@ -158,8 +163,10 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
 #
 # @return returncode of called cmd
 ####
+
+
 def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=None, outstream=None, environ=None):
-    #locate python file on path
+    # locate python file on path
     pythonfile.strip('"\'')
     if " " in pythonfile:
         pythonfile = '"' + pythonfile + '"'
@@ -167,11 +174,11 @@ def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=N
     logging.debug("RunPythonScript: {0} {1}".format(pythonfile, params))
     if(os.path.isabs(pythonfile)):
         logging.debug("Python Script was given as absolute path: %s" % pythonfile)
-    elif(os.path.isfile(os.path.join(os.getcwd(),pythonfile))):
+    elif(os.path.isfile(os.path.join(os.getcwd(), pythonfile))):
         pythonfile = os.path.join(os.getcwd(), pythonfile)
         logging.debug("Python Script was given as relative path: %s" % pythonfile)
     else:
-        #loop thru path environment variable
+        # loop thru path environment variable
         for a in os.getenv("PATH").split(os.pathsep):
             a = os.path.normpath(a)
             if os.path.isfile(os.path.join(a, pythonfile)):
@@ -181,14 +188,16 @@ def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=N
     params = pythonfile + " " + params
     return RunCmd(sys.executable, params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream, environ=environ)
 ####
-# Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.  
+# Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.
 # WARNING!!! : This should not be used for production signing as that process should follow stronger security practices (HSM / smart cards / etc)
-# 
-#  Signing is in format specified by UEFI authentacted variables 
+#
+#  Signing is in format specified by UEFI authentacted variables
 ####
+
+
 def DetachedSignWithSignTool(SignToolPath, ToSignFilePath, SignatureOutputFile, PfxFilePath, PfxPass=None, Oid="1.2.840.113549.1.7.2", Eku=None):
 
-    #check signtool path
+    # check signtool path
     if not os.path.exists(SignToolPath):
         logging.error("Path to signtool invalid.  %s" % SignToolPath)
         return -1
@@ -198,14 +207,14 @@ def DetachedSignWithSignTool(SignToolPath, ToSignFilePath, SignatureOutputFile, 
         SignToolPath = '"' + SignToolPath + '"'
 
     OutputDir = os.path.dirname(SignatureOutputFile)
-    #Signtool docs https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
-    #Signtool parameters from https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/secure-boot-key-generation-and-signing-using-hsm--example
+    # Signtool docs https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
+    # Signtool parameters from https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/secure-boot-key-generation-and-signing-using-hsm--example
     # Search for "Secure Boot Key Generation and Signing Using HSM"
     params = 'sign /fd sha256 /p7ce DetachedSignedData /p7co ' + Oid + ' /p7 "' + OutputDir + '" /f "' + PfxFilePath + '"'
     if Eku is not None:
-        params += ' /u ' + Eku 
+        params += ' /u ' + Eku
     if PfxPass is not None:
-        #add password if set
+        # add password if set
         params = params + ' /p ' + PfxPass
     params = params + ' /debug /v "' + ToSignFilePath + '" '
     ret = RunCmd(SignToolPath, params)
@@ -220,14 +229,16 @@ def DetachedSignWithSignTool(SignToolPath, ToSignFilePath, SignatureOutputFile, 
     return ret
 
 ####
-# Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.  
+# Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.
 # WARNING!!! : This should not be used for production signing as that process should follow stronger security practices (HSM / smart cards / etc)
-# 
+#
 #  Signing is catalog format which is an attached signature
 ####
+
+
 def CatalogSignWithSignTool(SignToolPath, ToSignFilePath, PfxFilePath, PfxPass=None):
 
-    #check signtool path
+    # check signtool path
     if not os.path.exists(SignToolPath):
         logging.error("Path to signtool invalid.  %s" % SignToolPath)
         return -1
@@ -237,11 +248,11 @@ def CatalogSignWithSignTool(SignToolPath, ToSignFilePath, PfxFilePath, PfxPass=N
         SignToolPath = '"' + SignToolPath + '"'
 
     OutputDir = os.path.dirname(ToSignFilePath)
-    #Signtool docs https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
-    #todo: link to catalog signing documentation
+    # Signtool docs https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
+    # todo: link to catalog signing documentation
     params = "sign /a /fd SHA256 /f " + PfxFilePath
     if PfxPass is not None:
-        #add password if set
+        # add password if set
         params = params + ' /p ' + PfxPass
     params = params + ' /debug /v "' + ToSignFilePath + '" '
     ret = RunCmd(SignToolPath, params, workingdir=OutputDir)
@@ -257,49 +268,48 @@ def CatalogSignWithSignTool(SignToolPath, ToSignFilePath, PfxFilePath, PfxPass=N
 def PrintByteList(ByteList, IncludeAscii=True, IncludeOffset=True, IncludeHexSep=True, OffsetStart=0):
     Ascii = ""
     for index in range(len(ByteList)):
-        #Start of New Line
+        # Start of New Line
         if(index % 16 == 0):
             if(IncludeOffset):
                 print("0x%04X -" % (index + OffsetStart), end='')
 
-        #Midpoint of a Line
+        # Midpoint of a Line
         if(index % 16 == 8):
             if(IncludeHexSep):
                 print(" -", end='')
 
-        #Print As Hex Byte
+        # Print As Hex Byte
         print(" 0x%02X" % ByteList[index], end='')
 
-        #Prepare to Print As Ascii
+        # Prepare to Print As Ascii
         if(ByteList[index] < 0x20) or (ByteList[index] > 0x7E):
             Ascii += "."
         else:
             Ascii += ("%c" % ByteList[index])
 
-        #End of Line
+        # End of Line
         if(index % 16 == 15):
             if(IncludeAscii):
                 print(" %s" % Ascii, end='')
             Ascii = ""
             print("")
 
-    #Done - Lets check if we have partial
+    # Done - Lets check if we have partial
     if(index % 16 != 15):
-        #Lets print any partial line of ascii
+        # Lets print any partial line of ascii
         if(IncludeAscii) and (Ascii != ""):
-            #Pad out to the correct spot
-            
+            # Pad out to the correct spot
+
             while(index % 16 != 15):
                 print("     ", end='')
-                if(index % 16 == 7):  #acount for the - symbol in the hex dump
+                if(index % 16 == 7):  # acount for the - symbol in the hex dump
                     if(IncludeOffset):
                         print("  ", end='')
                 index += 1
-            #print the ascii partial line
+            # print the ascii partial line
             print(" %s" % Ascii, end='')
-            #print a single newline so that next print will be on new line
+            # print a single newline so that next print will be on new line
         print("")
-
 
 
 if __name__ == '__main__':

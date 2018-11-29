@@ -1,4 +1,4 @@
-## @file Tpm2Defs_Test.py
+# @file Tpm2Defs_Test.py
 # This file contains utility classes to help interpret definitions from the
 # Tpm20.h header file in TianoCore.
 #
@@ -27,25 +27,26 @@
 ##
 
 import unittest
-import Tpm2Defs as t2d
+import MuPythonLibrary.TPM.Tpm2Defs as t2d
+
 
 class TestCommandCode(unittest.TestCase):
 
-  def test_get_code_returns_codes(self):
-    self.assertEqual(t2d.CommandCode.get_code('TPM_CC_Clear'), 0x00000126)
-    self.assertEqual(t2d.CommandCode.get_code('TPM_CC_ActivateCredential'), 0x00000147)
+    def test_get_code_returns_codes(self):
+        self.assertEqual(t2d.CommandCode.get_code('TPM_CC_Clear'), 0x00000126)
+        self.assertEqual(t2d.CommandCode.get_code('TPM_CC_ActivateCredential'), 0x00000147)
 
-  def test_get_code_returns_none_if_not_found(self):
-    self.assertEqual(t2d.CommandCode.get_code('I_AM_NOT_A_VALID_CODE'), None)
-    self.assertEqual(t2d.CommandCode.get_code(None), None)
+    def test_get_code_returns_none_if_not_found(self):
+        self.assertEqual(t2d.CommandCode.get_code('I_AM_NOT_A_VALID_CODE'), None)
+        self.assertEqual(t2d.CommandCode.get_code(None), None)
 
-  def test_get_string_returns_strings(self):
-    self.assertEqual(t2d.CommandCode.get_string(0x00000126), 'TPM_CC_Clear')
-    self.assertEqual(t2d.CommandCode.get_string(0x00000147), 'TPM_CC_ActivateCredential')
+    def test_get_string_returns_strings(self):
+        self.assertEqual(t2d.CommandCode.get_string(0x00000126), 'TPM_CC_Clear')
+        self.assertEqual(t2d.CommandCode.get_string(0x00000147), 'TPM_CC_ActivateCredential')
 
-  def test_get_string_returns_none_if_not_found(self):
-    self.assertEqual(t2d.CommandCode.get_string(0xFFFFFFFF), None)
-    
+    def test_get_string_returns_none_if_not_found(self):
+        self.assertEqual(t2d.CommandCode.get_string(0xFFFFFFFF), None)
+
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

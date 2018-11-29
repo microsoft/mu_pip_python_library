@@ -24,16 +24,16 @@
 # Python script that converts a raw DMAR table into a struct
 ##
 
-import os, sys
-from collections import namedtuple
+import os
+import sys
 import struct
-import datetime
 import xml.etree.ElementTree as ET
 
 DMARParserVersion = '1.01'
 
+
 class DMAR_TABLE(object):
-    #Header Lengths
+    # Header Lengths
     DMARHeaderLength = 48
     DRDHHeaderLength = 16
     RMRRHeaderLength = 24
@@ -45,11 +45,11 @@ class DMAR_TABLE(object):
         self.dmar_table = self.ACPI_TABLE_HEADER(data)
         self.data = data[DMAR_TABLE.DMARHeaderLength:]
         while len(self.data) > 0:
-            #Get type and length of remapping struct
+            # Get type and length of remapping struct
             remapping_header = self.REMAPPING_STRUCT_HEADER(self.data)
             assert remapping_header.Type < 5, "Reserved remapping struct found in DMAR table"
 
-            #Parse remapping struct
+            # Parse remapping struct
             if remapping_header.Type == 0:
                 remapping_header = self.DRHD_STRUCT(self.data, remapping_header.Length)
             elif remapping_header.Type == 1:
@@ -67,7 +67,7 @@ class DMAR_TABLE(object):
                 sys.exit(-1)
 
             self.dmar_table.SubStructs.append(remapping_header)
-            #Add to XML
+            # Add to XML
             self.data = self.data[remapping_header.Length:]
 
         self.xml = self.toXml()
@@ -79,7 +79,7 @@ class DMAR_TABLE(object):
             root.append(sub.toXml())
 
         return root
-            
+
     def __str__(self):
         retval = str(self.dmar_table)
 
@@ -94,10 +94,10 @@ class DMAR_TABLE(object):
     def ANDDCount(self):
         return self.dmar_table.ANDDCount
 
-    def CheckRMRRCount(self, goldenxml = None):
+    def CheckRMRRCount(self, goldenxml=None):
         goldenignores = set()
 
-        if goldenxml == None or not os.path.isfile(goldenxml):
+        if goldenxml is None or not os.path.isfile(goldenxml):
             print("XML File not found")
         else:
             goldenfile = ET.parse(goldenxml)
@@ -148,21 +148,21 @@ class DMAR_TABLE(object):
       Creator Revision   : 0x%08X
       Host Address Width : 0x%02X
       Flags              : 0x%02X
-    """ % ( self.Signature, self.Length, self.Revision, self.Checksum, self.OEMID, self.OEMTableID, self.OEMRevision, self.CreatorID, self.CreatorRevision, self.HostAddressWidth, self.Flags)
+    """ % (self.Signature, self.Length, self.Revision, self.Checksum, self.OEMID, self.OEMTableID, self.OEMRevision, self.CreatorID, self.CreatorRevision, self.HostAddressWidth, self.Flags)
 
         def toXml(self):
             xml_repr = ET.Element('AcpiTableHeader')
-            xml_repr.set('Signature',        '%s'   % self.Signature)
-            xml_repr.set('Length',           '0x%X' % self.Length)
-            xml_repr.set('Revision',         '0x%X' % self.Revision)
-            xml_repr.set('Checksum',         '0x%X' % self.Checksum)
-            xml_repr.set('OEMID',            '%s'   % self.OEMID)
-            xml_repr.set('OEMTableID',       '%s'   % self.OEMTableID)
-            xml_repr.set('OEMRevision',      '0x%X' % self.OEMRevision)
-            xml_repr.set('CreatorID',        '%s'   % self.CreatorID)
-            xml_repr.set('CreatorRevision',  '0x%X' % self.CreatorRevision)
+            xml_repr.set('Signature', '%s' % self.Signature)
+            xml_repr.set('Length', '0x%X' % self.Length)
+            xml_repr.set('Revision', '0x%X' % self.Revision)
+            xml_repr.set('Checksum', '0x%X' % self.Checksum)
+            xml_repr.set('OEMID', '%s' % self.OEMID)
+            xml_repr.set('OEMTableID', '%s' % self.OEMTableID)
+            xml_repr.set('OEMRevision', '0x%X' % self.OEMRevision)
+            xml_repr.set('CreatorID', '%s' % self.CreatorID)
+            xml_repr.set('CreatorRevision', '0x%X' % self.CreatorRevision)
             xml_repr.set('HostAddressWidth', '0x%X' % self.HostAddressWidth)
-            xml_repr.set('Flags',            '0x%X' % self.Flags)
+            xml_repr.set('Flags', '0x%X' % self.Flags)
             return xml_repr
 
     class REMAPPING_STRUCT_HEADER(object):
@@ -177,7 +177,7 @@ class DMAR_TABLE(object):
     ------------------------------------------------------------------
       Type               : 0x%04X
       Length             : 0x%04X
-    """ % ( self.Type, self.Length)
+    """ % (self.Type, self.Length)
 
     class DRHD_STRUCT(REMAPPING_STRUCT_HEADER):
         struct_format = '=HHBBHQ'
@@ -190,7 +190,7 @@ class DMAR_TABLE(object):
              self.SegmentNumber,
              self.RegisterBaseAddress) = struct.unpack_from(DMAR_TABLE.DRHD_STRUCT.struct_format, header_byte_array)
 
-            #Get Sub Structs
+            # Get Sub Structs
             self.DeviceScope = list()
             header_byte_array = header_byte_array[DMAR_TABLE.DRDHHeaderLength:]
             bytes_left = self.Length - DMAR_TABLE.DRDHHeaderLength
@@ -202,21 +202,21 @@ class DMAR_TABLE(object):
 
         def toXml(self):
             xml_repr = ET.Element('DRHD')
-            xml_repr.set('Type',                '0x%X' % self.Type)
-            xml_repr.set('Length',              '0x%X' % self.Length)
-            xml_repr.set('Flags',               '0x%X' % self.Flags)
-            xml_repr.set('Reserved',            '0x%X' % self.Reserved)
-            xml_repr.set('SegmentNumber',       '0x%X'   % self.SegmentNumber)
-            xml_repr.set('RegisterBaseAddress', '0x%X'   % self.RegisterBaseAddress)
-            
-            #Add SubStructs
+            xml_repr.set('Type', '0x%X' % self.Type)
+            xml_repr.set('Length', '0x%X' % self.Length)
+            xml_repr.set('Flags', '0x%X' % self.Flags)
+            xml_repr.set('Reserved', '0x%X' % self.Reserved)
+            xml_repr.set('SegmentNumber', '0x%X' % self.SegmentNumber)
+            xml_repr.set('RegisterBaseAddress', '0x%X' % self.RegisterBaseAddress)
+
+            # Add SubStructs
             for item in self.DeviceScope:
                 xml_subitem = ET.SubElement(xml_repr, item.TypeString)
-                xml_subitem.set('Type',          '0x%X' % item.Type)
-                xml_subitem.set('Length',        '0x%X' % item.Length)
-                xml_subitem.set('Reserved',      '0x%X' % item.Reserved)
-                xml_subitem.set('EnumerationID', '0x%X'   % item.EnumerationID)
-                xml_subitem.set('StartBusNumber', '0x%X'   % item.StartBusNumber)
+                xml_subitem.set('Type', '0x%X' % item.Type)
+                xml_subitem.set('Length', '0x%X' % item.Length)
+                xml_subitem.set('Reserved', '0x%X' % item.Reserved)
+                xml_subitem.set('EnumerationID', '0x%X' % item.EnumerationID)
+                xml_subitem.set('StartBusNumber', '0x%X' % item.StartBusNumber)
 
             return xml_repr
 
@@ -229,7 +229,7 @@ class DMAR_TABLE(object):
       Reserved              : 0x%02X
       Segment Number        : 0x%04x
       Register Base Address : 0x%016x
-    """ % ( self.Type, self.Length, self.Flags, self.Reserved, self.SegmentNumber, self.RegisterBaseAddress)
+    """ % (self.Type, self.Length, self.Flags, self.Reserved, self.SegmentNumber, self.RegisterBaseAddress)
 
             for item in self.DeviceScope:
                 retstring += str(item)
@@ -247,7 +247,7 @@ class DMAR_TABLE(object):
              self.ReservedMemoryBaseAddress,
              self.ReservedMemoryRegionLimitAddress) = struct.unpack_from(DMAR_TABLE.RMRR_STRUCT.struct_format, header_byte_array)
 
-            #Get Sub Structs
+            # Get Sub Structs
             self.DeviceScope = list()
             header_byte_array = header_byte_array[DMAR_TABLE.RMRRHeaderLength:]
             bytes_left = self.Length - DMAR_TABLE.RMRRHeaderLength
@@ -259,30 +259,29 @@ class DMAR_TABLE(object):
 
         def getPath(self):
             retString = ""
-            for index,item in enumerate(self.DeviceScope):
+            for index, item in enumerate(self.DeviceScope):
                 retString += self.DeviceScope[index].getPath()
-                if index != len(self.DeviceScope)-1:
+                if index != len(self.DeviceScope) - 1:
                     retString += ", "
             return retString
 
-
         def toXml(self):
             xml_repr = ET.Element('RMRR')
-            xml_repr.set('Type',                             '0x%X' % self.Type)
-            xml_repr.set('Length',                           '0x%X' % self.Length)
-            xml_repr.set('Reserved',                         '0x%X' % self.Reserved)
-            xml_repr.set('SegmentNumber',                    '0x%X'   % self.SegmentNumber)
-            xml_repr.set('ReservedMemoryBaseAddress',        '0x%X'   % self.ReservedMemoryBaseAddress)
-            xml_repr.set('ReservedMemoryRegionLimitAddress', '0x%X'   % self.ReservedMemoryRegionLimitAddress)
-            
-            #Add SubStructs
+            xml_repr.set('Type', '0x%X' % self.Type)
+            xml_repr.set('Length', '0x%X' % self.Length)
+            xml_repr.set('Reserved', '0x%X' % self.Reserved)
+            xml_repr.set('SegmentNumber', '0x%X' % self.SegmentNumber)
+            xml_repr.set('ReservedMemoryBaseAddress', '0x%X' % self.ReservedMemoryBaseAddress)
+            xml_repr.set('ReservedMemoryRegionLimitAddress', '0x%X' % self.ReservedMemoryRegionLimitAddress)
+
+            # Add SubStructs
             for item in self.DeviceScope:
                 xml_subitem = ET.SubElement(xml_repr, item.TypeString)
-                xml_subitem.set('Type',          '0x%X' % item.Type)
-                xml_subitem.set('Length',        '0x%X' % item.Length)
-                xml_subitem.set('Reserved',      '0x%X' % item.Reserved)
-                xml_subitem.set('EnumerationID', '0x%X'   % item.EnumerationID)
-                xml_subitem.set('StartBusNumber', '0x%X'   % item.StartBusNumber)
+                xml_subitem.set('Type', '0x%X' % item.Type)
+                xml_subitem.set('Length', '0x%X' % item.Length)
+                xml_subitem.set('Reserved', '0x%X' % item.Reserved)
+                xml_subitem.set('EnumerationID', '0x%X' % item.EnumerationID)
+                xml_subitem.set('StartBusNumber', '0x%X' % item.StartBusNumber)
 
             return xml_repr
 
@@ -295,7 +294,7 @@ class DMAR_TABLE(object):
       Segment Number                       : 0x%04x
       Reserved Memory Base Address         : 0x%016x
       Reserved Memory Region Limit Address : 0x%016x
-    """ % ( self.Type, self.Length, self.Reserved, self.SegmentNumber, self.ReservedMemoryBaseAddress, self.ReservedMemoryRegionLimitAddress)
+    """ % (self.Type, self.Length, self.Reserved, self.SegmentNumber, self.ReservedMemoryBaseAddress, self.ReservedMemoryRegionLimitAddress)
 
             for item in self.DeviceScope:
                 retstring += str(item)
@@ -312,7 +311,7 @@ class DMAR_TABLE(object):
              self.Reserved,
              self.SegmentNumber) = struct.unpack_from(DMAR_TABLE.ATSR_STRUCT.struct_format, header_byte_array)
 
-            #Get Sub Structs
+            # Get Sub Structs
             self.DeviceScope = list()
             header_byte_array = header_byte_array[DMAR_TABLE.ASTRHeaderLength:]
             bytes_left = self.Length - DMAR_TABLE.ASTRHeaderLength
@@ -324,20 +323,20 @@ class DMAR_TABLE(object):
 
         def toXml(self):
             xml_repr = ET.Element('ASTR')
-            xml_repr.set('Type',          '0x%X' % self.Type)
-            xml_repr.set('Length',        '0x%X' % self.Length)
-            xml_repr.set('Flags',         '0x%X' % self.Flags)
-            xml_repr.set('Reserved',      '0x%X' % self.Reserved)
+            xml_repr.set('Type', '0x%X' % self.Type)
+            xml_repr.set('Length', '0x%X' % self.Length)
+            xml_repr.set('Flags', '0x%X' % self.Flags)
+            xml_repr.set('Reserved', '0x%X' % self.Reserved)
             xml_repr.set('SegmentNumber', '0x%X' % self.SegmentNumber)
-            
-            #Add SubStructs
+
+            # Add SubStructs
             for item in self.DeviceScope:
                 xml_subitem = ET.SubElement(xml_repr, item.TypeString)
-                xml_subitem.set('Type',          '0x%X' % item.Type)
-                xml_subitem.set('Length',        '0x%X' % item.Length)
-                xml_subitem.set('Reserved',      '0x%X' % item.Reserved)
-                xml_subitem.set('EnumerationID', '0x%X'   % item.EnumerationID)
-                xml_subitem.set('StartBusNumber', '0x%X'   % item.StartBusNumber)
+                xml_subitem.set('Type', '0x%X' % item.Type)
+                xml_subitem.set('Length', '0x%X' % item.Length)
+                xml_subitem.set('Reserved', '0x%X' % item.Reserved)
+                xml_subitem.set('EnumerationID', '0x%X' % item.EnumerationID)
+                xml_subitem.set('StartBusNumber', '0x%X' % item.StartBusNumber)
 
             return xml_repr
 
@@ -349,13 +348,12 @@ class DMAR_TABLE(object):
       Flags                                : 0x%02X
       Reserved                             : 0x%02X
       Segment Number                       : 0x%04x
-    """ % ( self.Type, self.Length, self.Flags, self.Reserved, self.SegmentNumber)
+    """ % (self.Type, self.Length, self.Flags, self.Reserved, self.SegmentNumber)
 
             for item in self.DeviceScope:
                 retstring += str(item)
 
             return retstring
-
 
     class RHSA_STRUCT(REMAPPING_STRUCT_HEADER):
         struct_format = '=HHIQI'
@@ -369,11 +367,11 @@ class DMAR_TABLE(object):
 
         def toXml(self):
             xml_repr = ET.Element('RHSA')
-            xml_repr.set('Type',                '0x%X' % self.Type)
-            xml_repr.set('Length',              '0x%X' % self.Length)
-            xml_repr.set('Reserved',            '0x%X' % self.Reserved)
+            xml_repr.set('Type', '0x%X' % self.Type)
+            xml_repr.set('Length', '0x%X' % self.Length)
+            xml_repr.set('Reserved', '0x%X' % self.Reserved)
             xml_repr.set('RegisterBaseAddress', '0x%X' % self.RegisterBaseAddress)
-            xml_repr.set('ProximityDomain',     '0x%X' % self.ProximityDomain)
+            xml_repr.set('ProximityDomain', '0x%X' % self.ProximityDomain)
 
             return xml_repr
 
@@ -385,7 +383,7 @@ class DMAR_TABLE(object):
       Reserved                             : 0x%08X
       Register Base Address                : 0x%016X
       Proximity Domain                     : 0x%08x
-    """ % ( self.Type, self.Length, self.Reserved, self.RegisterBaseAddress, self.ProximityDomain)
+    """ % (self.Type, self.Length, self.Reserved, self.RegisterBaseAddress, self.ProximityDomain)
 
     class ANDD_STRUCT(REMAPPING_STRUCT_HEADER):
         header_format = '=HH'
@@ -395,26 +393,25 @@ class DMAR_TABLE(object):
             (self.Type,
              self.Length) = struct.unpack_from(DMAR_TABLE.ANDD_STRUCT.header_format, header_byte_array)
 
-            #Since there is no variable of size 3 we need to manually pull into reserved
+            # Since there is no variable of size 3 we need to manually pull into reserved
             self.Reserved = 0
-            for i in range(6,3,-1):
+            for i in range(6, 3, -1):
                 self.Reserved = self.Reserved << 8
-                self.Reserved |= struct.unpack("<B",header_byte_array[i:i+1])[0]
+                self.Reserved |= struct.unpack("<B", header_byte_array[i:i + 1])[0]
             header_byte_array = header_byte_array[7:]
 
-            #Unpack remaining values
+            # Unpack remaining values
             self.struct_format = self.struct_format + str(self.Length - DMAR_TABLE.ANDDHeaderLength) + 's'
             (self.ACPIDeviceNumber,
              self.ACPIObjectName) = struct.unpack_from(self.struct_format, header_byte_array)
 
-
         def toXml(self):
             xml_repr = ET.Element('ANDD')
-            xml_repr.set('Type',                '0x%X' % self.Type)
-            xml_repr.set('Length',              '0x%X' % self.Length)
-            xml_repr.set('Reserved',            '0x%X' % self.Reserved)
-            xml_repr.set('ACPIDeviceNumber',    '0x%X' % self.ACPIDeviceNumber)
-            xml_repr.set('ACPIObjectName',      '%s' % self.ACPIObjectName)
+            xml_repr.set('Type', '0x%X' % self.Type)
+            xml_repr.set('Length', '0x%X' % self.Length)
+            xml_repr.set('Reserved', '0x%X' % self.Reserved)
+            xml_repr.set('ACPIDeviceNumber', '0x%X' % self.ACPIDeviceNumber)
+            xml_repr.set('ACPIObjectName', '%s' % self.ACPIObjectName)
 
             return xml_repr
 
@@ -426,7 +423,7 @@ class DMAR_TABLE(object):
       Reserved                             : 0x%06X
       ACPI Device Number                   : 0x%02X
       ACPI Object Name                     : %s
-    """ % ( self.Type, self.Length, self.Reserved, self.ACPIDeviceNumber, self.ACPIObjectName)
+    """ % (self.Type, self.Length, self.Reserved, self.ACPIDeviceNumber, self.ACPIObjectName)
 
     class DEVICE_SCOPE_STRUCT(object):
         struct_format = '=BBHBB'
@@ -454,21 +451,20 @@ class DMAR_TABLE(object):
                 print("Reserved Device Scope Type Found")
                 sys.exit(-1)
 
-            number_path_entries = (self.Length - DMAR_TABLE.DeviceScopeHeaderLength)/2
+            number_path_entries = (self.Length - DMAR_TABLE.DeviceScopeHeaderLength) / 2
             offset = 6
             self.Path = list()
             while number_path_entries > 0:
-                #self.Path.append((int.from_bytes(header_byte_array[offset:offset+1], byteorder='little'), int.from_bytes(header_byte_array[offset+1:offset+2], byteorder='little')))
-                self.Path.append((struct.unpack("<B", header_byte_array[offset:offset+1]), struct.unpack("<B", header_byte_array[offset+1:offset+2])))
+                self.Path.append((struct.unpack("<B", header_byte_array[offset:offset + 1]), struct.unpack("<B", header_byte_array[offset + 1:offset + 2])))
                 offset += 2
                 number_path_entries -= 1
 
         def getPath(self):
             retstring = "%02d" % self.StartBusNumber + ":"
 
-            for (index,item) in enumerate(self.Path):
+            for (index, item) in enumerate(self.Path):
                 retstring += "%02d" % item[0] + "." + "%01d" % item[1]
-                if index != len(self.Path)-1:
+                if index != len(self.Path) - 1:
                     retstring += ":"
 
             return retstring
@@ -481,14 +477,13 @@ class DMAR_TABLE(object):
     \t\t  Reserved              : 0x%04X
     \t\t  Enumeration ID        : 0x%02x
     \t\t  Start Bus Number      : 0x%02x
-    \t\t  Path                  : """ % ( self.TypeString, self.Type, self.Length, self.Reserved, self.EnumerationID, self.StartBusNumber)
+    \t\t  Path                  : """ % (self.TypeString, self.Type, self.Length, self.Reserved, self.EnumerationID, self.StartBusNumber)
 
             retstring += "%02d" % self.StartBusNumber + ":"
-            for (index,item) in enumerate(self.Path):
+            for (index, item) in enumerate(self.Path):
                 retstring += "%02d" % item[0] + "." + "%01d" % item[1]
-                if index != len(self.Path)-1:
+                if index != len(self.Path) - 1:
                     retstring += ":"
             retstring += "\n"
 
             return retstring
-

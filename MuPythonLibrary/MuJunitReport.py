@@ -1,8 +1,8 @@
-## @file MuJunitReport.py
+# @file MuJunitReport.py
 # This module contains support for Outputting Junit xml.
 #
 # Used to support CI/CD and exporting test results for other tools.
-# This does test report generation without being a test runner. 
+# This does test report generation without being a test runner.
 ##
 # Copyright (c) 2018, Microsoft Corporation
 #
@@ -28,10 +28,12 @@
 ##
 import time
 
+
 class MuError(object):
     def __init__(self, type, msg):
         self.Message = msg
         self.Type = type
+
 
 class MuFailure(object):
     def __init__(self, type, msg):
@@ -41,7 +43,9 @@ class MuFailure(object):
 ##
 # Test Case class
 #
-## 
+##
+
+
 class MuTestCase(object):
     NEW = 1
     SKIPPED = 2
@@ -54,7 +58,7 @@ class MuTestCase(object):
         self.ClassName = ClassName
         self.Time = 0
         self.Status = MuTestCase.NEW
-        
+
         self.FailureMsg = None
         self.ErrorMsg = None
         self._TestSuite = None
@@ -62,14 +66,12 @@ class MuTestCase(object):
         self.StdOut = ""
         self._StartTime = time.time()
 
-
     def SetFailed(self, Msg, Type):
         if(self.Status != MuTestCase.NEW):
             raise Exception("Can't Set to failed.  State must be in NEW")
         self.Time = time.time() - self._StartTime
         self.Status = MuTestCase.FAILED
         self.FailureMsg = MuFailure(Type, Msg)
-    
 
     def SetError(self, Msg, Type):
         if(self.Status != MuTestCase.NEW):
@@ -80,19 +82,19 @@ class MuTestCase(object):
 
     def SetSuccess(self):
         if(self.Status != MuTestCase.NEW):
-            raise Exception("Can't Set to success.  State must be in NEW")    
+            raise Exception("Can't Set to success.  State must be in NEW")
         self.Status = MuTestCase.SUCCESS
         self.Time = time.time() - self._StartTime
 
     def SetSkipped(self):
         if(self.Status != MuTestCase.NEW):
-            raise Exception("Can't Set to skipped.  State must be in NEW")    
+            raise Exception("Can't Set to skipped.  State must be in NEW")
         self.Status = MuTestCase.SKIPPED
         self.Time = time.time() - self._StartTime
 
     def LogStdOut(self, msg):
         self.StdOut += msg.strip() + "\n "
-    
+
     def LogStdError(self, msg):
         self.StdErr += msg.strip() + "\n "
 
@@ -106,7 +108,7 @@ class MuTestCase(object):
             outstream.write('<error message="{0}" type="{1}" />'.format(self.ErrorMsg.Message, self.ErrorMsg.Type))
         elif self.Status != MuTestCase.SUCCESS:
             raise Exception("Can't output a testcase {0}.{1} in invalid state {2}".format(self.ClassName, self.Name, self.Status))
-        
+
         outstream.write('<system-out>' + self.StdOut + '</system-out>')
         outstream.write('<system-err>' + self.StdErr + '</system-err>')
         outstream.write('</testcase>')
@@ -129,11 +131,11 @@ class MuTestSuite(object):
         self.TestCases.append(tc)
         tc._TestSuite = self
         return tc
-    
+
     def Output(self, outstream):
         Errors = 0
         Failures = 0
-        Skipped  = 0
+        Skipped = 0
         Tests = len(self.TestCases)
 
         for a in self.TestCases:
@@ -143,13 +145,13 @@ class MuTestSuite(object):
                 Errors += 1
             elif(a.Status == MuTestCase.SKIPPED):
                 Skipped += 1
-        
+
         outstream.write('<testsuite id="{0}" name="{1}" package="{2}" errors="{3}" tests="{4}" failures="{5}" skipped="{6}">'.format
-        (self.TestId, self.Name, self.Package, Errors, Tests, Failures, Skipped))
+                        (self.TestId, self.Name, self.Package, Errors, Tests, Failures, Skipped))
 
         for a in self.TestCases:
             a.Output(outstream)
-        
+
         outstream.write('</testsuite>')
 
 ##
@@ -157,6 +159,8 @@ class MuTestSuite(object):
 #
 #
 ##
+
+
 class MuJunitReport(object):
     def __init__(self):
         self.TestSuites = []
