@@ -24,7 +24,6 @@ steps:
 
 - script: pytest -v --junitxml=test.junit.xml --html=pytest_MuPythonLibrary_report.html --self-contained-html --cov=MuPythonLibrary --cov-report html:cov_html --cov-report xml:cov.xml --cov-config .coveragerc
   displayName: 'Run UnitTests'
-  continueOnError: true
 
 # Publish Test Results to Azure Pipelines/TFS
 - task: PublishTestResults@2
