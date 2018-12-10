@@ -11,6 +11,11 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.2.9
+-----
+
+Use setuptools-scm for version management and enable CI/CD support.  Start using tags for releases.
+
 0.2.8
 -----
 
