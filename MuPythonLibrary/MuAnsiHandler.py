@@ -239,7 +239,7 @@ class ColoredStreamHandler(logging.StreamHandler):
     ANSI_CSI_RE = re.compile('\001?\033\\[((?:\\d|;)*)([a-zA-Z])\002?')
 
     def __init__(self, stream=None, strip=None, convert=None):
-        logging.StreamHandler.__init__(self)
+        logging.StreamHandler.__init__(self, stream)
         self.on_windows = os.name == 'nt'
         # We test if the WinAPI works, because even if we are on Windows
         # we may be using a terminal that doesn't support the WinAPI
@@ -249,14 +249,18 @@ class ColoredStreamHandler(logging.StreamHandler):
         self.strip = False
         # should we strip ANSI sequences from our output?
         if strip is None:
-            self.strip = self.conversion_supported or (
+            strip = self.conversion_supported or (
                 not self.stream.closed and not self.stream.isatty())
+        self.strip = strip
 
         # should we should convert ANSI sequences into win32 calls?
         if convert is None:
             convert = (self.conversion_supported and not self.stream.closed and self.stream.isatty())
         self.convert = convert
         self.win32_calls = None
+
+        if stream is not None:
+            self.stream = stream
 
         if self.on_windows:
             self.win32_calls = self.get_win32_calls()
