@@ -29,11 +29,13 @@ import logging
 import re
 import os
 try:
+    # try to import windows types from winDLL
     import ctypes
     from ctypes import LibraryLoader
     windll = LibraryLoader(ctypes.WinDLL)
     from ctypes import wintypes
 except (AttributeError, ImportError):
+    # if we run into an exception (ie on unix or linux)
     windll = None
 
     # create blank lambda
@@ -45,6 +47,8 @@ except (AttributeError, ImportError):
         None
 
 else:
+    # if we don't raise an exception when we import windows types
+    # then execute this but don't catch an exception if raised
     from ctypes import byref, Structure
 
     # inspired by https://github.com/tartley/colorama/
