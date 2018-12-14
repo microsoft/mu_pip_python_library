@@ -410,8 +410,13 @@ class ColoredStreamHandler(logging.StreamHandler):
     # logging.handler method we are overriding to emit a record
     def emit(self, record):
         try:
+            if record is None:
+                return
             msg = self.format(record)
-            self.write(msg + self.terminator)
+            if msg is None:
+                return
+            self.write(str(msg))
+            self.write(self.terminator)
             self.flush()
         except Exception:
-            self.handleError(record)
+            self.handleError(record
