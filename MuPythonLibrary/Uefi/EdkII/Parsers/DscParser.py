@@ -83,7 +83,8 @@ class DscParser(HashFileParser):
                     p = self.ParseInfPathLib(line_resolved)
                     self.Libs.append(p)
                     self.Logger.debug("Found Library in a 64bit BuildOptions Section: %s" % p)
-                elif("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+                elif "tokenspaceguid" in line_resolved.lower() and \
+                        line_resolved.count('|') > 0 and line_resolved.count('.') > 0:
                     # should be a pcd statement
                     p = line_resolved.partition('|')
                     self.Pcds.append(p[0].strip())
@@ -105,7 +106,8 @@ class DscParser(HashFileParser):
                     p = self.ParseInfPathLib(line_resolved)
                     self.Libs.append(p)
                     self.Logger.debug("Found Library in a 32bit BuildOptions Section: %s" % p)
-                elif("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+                elif "tokenspaceguid" in line_resolved.lower() and \
+                        line_resolved.count('|') > 0 and line_resolved.count('.') > 0:
                     # should be a pcd statement
                     p = line_resolved.partition('|')
                     self.Pcds.append(p[0].strip())
@@ -128,7 +130,8 @@ class DscParser(HashFileParser):
                     p = self.ParseInfPathLib(line_resolved)
                     self.Libs.append(p)
                     self.Logger.debug("Found Library in a BuildOptions Section: %s" % p)
-                elif("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+                elif "tokenspaceguid" in line_resolved.lower() and \
+                        line_resolved.count('|') > 0 and line_resolved.count('.') > 0:
                     # should be a pcd statement
                     p = line_resolved.partition('|')
                     self.Pcds.append(p[0].strip())
@@ -153,7 +156,8 @@ class DscParser(HashFileParser):
             return (line_resolved, [])
         # process line in PCD section
         elif(self.CurrentSection.upper().startswith("PCDS")):
-            if("tokenspaceguid" in line_resolved.lower() and (line_resolved.count('|') > 0) and (line_resolved.count('.') > 0)):
+            if "tokenspaceguid" in line_resolved.lower() and \
+                    line_resolved.count('|') > 0 and line_resolved.count('.') > 0:
                 # should be a pcd statement
                 p = line_resolved.partition('|')
                 self.Pcds.append(p[0].strip())

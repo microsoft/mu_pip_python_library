@@ -62,7 +62,8 @@ class VariableStore(object):
         # Advance the file cursor and load the VarStore header.
         self.rom_file.seek(self.fv_header.HeaderLength, os.SEEK_CUR)
         self.var_store_header = VF.VariableStoreHeader().load_from_file(self.rom_file)
-        if (self.var_store_header.Format != VF.VARIABLE_STORE_FORMATTED or self.var_store_header.State != VF.VARIABLE_STORE_HEALTHY):
+        if self.var_store_header.Format != VF.VARIABLE_STORE_FORMATTED or \
+                self.var_store_header.State != VF.VARIABLE_STORE_HEALTHY:
             raise Exception("VarStore is invalid or cannot be processed with this helper!")
 
         # Now we're finally ready to read some variables.
@@ -111,7 +112,8 @@ class VariableStore(object):
         dummy_var = self.get_new_var_class()
         var_size += dummy_var.StructSize
         if var_size > self.var_store_header.Size:
-            raise Exception("Total variable size %d is too large to fit in VarStore %d!" % (var_size, self.var_store_header.Size))
+            raise Exception("Total variable size %d is too large to fit in VarStore %d!" %
+                            (var_size, self.var_store_header.Size))
 
         # Now, we just have to serialize each variable in turn and write them to the mmap buffer.
         var_offset = self.store_base + self.fv_header.HeaderLength + self.var_store_header.StructSize

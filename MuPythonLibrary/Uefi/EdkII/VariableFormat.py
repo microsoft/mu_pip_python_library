@@ -82,7 +82,8 @@ class VariableStoreHeader(object):
         file.seek(orig_seek)
 
         # Load this object with the contents of the data.
-        (signature_bin, self.Size, self.Format, self.State, self.Reserved0, self.Reserved1) = struct.unpack(self.StructString, struct_bytes)
+        (signature_bin, self.Size, self.Format, self.State, self.Reserved0,
+            self.Reserved1) = struct.unpack(self.StructString, struct_bytes)
 
         # Update the GUID to be a UUID object.
         if sys.byteorder == 'big':
@@ -100,7 +101,8 @@ class VariableStoreHeader(object):
 
     def serialize(self):
         signature_bin = self.Signature.bytes if sys.byteorder == 'big' else self.Signature.bytes_le
-        return struct.pack(self.StructString, signature_bin, self.Size, self.Format, self.State, self.Reserved0, self.Reserved1)
+        return struct.pack(self.StructString, signature_bin, self.Size, self.Format,
+                           self.State, self.Reserved0, self.Reserved1)
 
 #
 # TODO: VariableHeader and AuthenticatedVariableHeader are not truly
@@ -137,7 +139,8 @@ class VariableHeader(object):
         self.Data = None
 
     def populate_structure_fields(self, in_bytes):
-        (self.StartId, self.State, reserved, self.Attributes, self.NameSize, self.DataSize, self.VendorGuid) = struct.unpack(self.StructString, in_bytes)
+        (self.StartId, self.State, reserved, self.Attributes, self.NameSize,
+            self.DataSize, self.VendorGuid) = struct.unpack(self.StructString, in_bytes)
 
     def load_from_bytes(self, in_bytes):
         # Load this object with the contents of the data.
@@ -155,7 +158,8 @@ class VariableHeader(object):
 
         # Finally, load the data.
         data_offset = self.StructSize
-        self.Name = in_bytes[data_offset:(data_offset + self.NameSize)].decode('utf-16')[:-1]  # Strip the terminating char.
+        self.Name = in_bytes[data_offset:(data_offset + self.NameSize)].decode('utf-16')
+        self.Name = self.Name[:-1]  # Strip the terminating char.
         data_offset += self.NameSize
         self.Data = in_bytes[data_offset:(data_offset + self.DataSize)]
 

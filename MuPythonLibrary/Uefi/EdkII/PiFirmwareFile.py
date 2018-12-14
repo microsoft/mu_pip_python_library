@@ -62,7 +62,8 @@ class EfiFirmwareFileSystemHeader(object):
         file.seek(orig_seek)
 
         # Load this object with the contents of the data.
-        (self.FileSystemGuid, self.Checksum, self.Type, self.Attributes, self.Size0, self.Size1, self.Size2, self.State) = struct.unpack(self.StructString, struct_bytes)
+        (self.FileSystemGuid, self.Checksum, self.Type, self.Attributes, self.Size0, self.Size1,
+            self.Size2, self.State) = struct.unpack(self.StructString, struct_bytes)
 
         # Update the GUID to be a UUID object.
         if sys.byteorder == 'big':
@@ -74,4 +75,5 @@ class EfiFirmwareFileSystemHeader(object):
 
     def serialize(self):
         file_system_guid_bin = self.FileSystemGuid.bytes if sys.byteorder == 'big' else self.FileSystemGuid.bytes_le
-        return struct.pack(self.StructString, file_system_guid_bin, self.Checksum, self.Type, self.Attributes, self.Size0, self.Size1, self.Size2, self.State)
+        return struct.pack(self.StructString, file_system_guid_bin, self.Checksum,
+                           self.Type, self.Attributes, self.Size0, self.Size1, self.Size2, self.State)

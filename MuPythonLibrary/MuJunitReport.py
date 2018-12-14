@@ -103,11 +103,13 @@ class MuTestCase(object):
         if self.Status == MuTestCase.SKIPPED:
             outstream.write('<skipped />')
         elif self.Status == MuTestCase.FAILED:
-            outstream.write('<failure message="{0}" type="{1}" />'.format(self.FailureMsg.Message, self.FailureMsg.Type))
+            outstream.write('<failure message="{0}" type="{1}" />'.format(self.FailureMsg.Message,
+                                                                          self.FailureMsg.Type))
         elif self.Status == MuTestCase.ERROR:
             outstream.write('<error message="{0}" type="{1}" />'.format(self.ErrorMsg.Message, self.ErrorMsg.Type))
         elif self.Status != MuTestCase.SUCCESS:
-            raise Exception("Can't output a testcase {0}.{1} in invalid state {2}".format(self.ClassName, self.Name, self.Status))
+            raise Exception("Can't output a testcase {0}.{1} in invalid state {2}".format(self.ClassName,
+                                                                                          self.Name, self.Status))
 
         outstream.write('<system-out>' + self.StdOut + '</system-out>')
         outstream.write('<system-err>' + self.StdErr + '</system-err>')
@@ -146,8 +148,9 @@ class MuTestSuite(object):
             elif(a.Status == MuTestCase.SKIPPED):
                 Skipped += 1
 
-        outstream.write('<testsuite id="{0}" name="{1}" package="{2}" errors="{3}" tests="{4}" failures="{5}" skipped="{6}">'.format
-                        (self.TestId, self.Name, self.Package, Errors, Tests, Failures, Skipped))
+        outstream.write('<testsuite id="{0}" name="{1}" package="{2}" errors="{3}" tests="{4}" '
+                        'failures="{5}" skipped="{6}">'.format(self.TestId, self.Name, self.Package,
+                                                               Errors, Tests, Failures, Skipped))
 
         for a in self.TestCases:
             a.Output(outstream)

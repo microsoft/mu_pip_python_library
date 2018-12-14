@@ -186,16 +186,19 @@ def RunPythonScript(pythonfile, params, capture=True, workingdir=None, outfile=N
                 logging.debug("Python Script was found on the path: %s" % pythonfile)
                 break
     params = pythonfile + " " + params
-    return RunCmd(sys.executable, params, capture=capture, workingdir=workingdir, outfile=outfile, outstream=outstream, environ=environ)
+    return RunCmd(sys.executable, params, capture=capture, workingdir=workingdir, outfile=outfile,
+                  outstream=outstream, environ=environ)
 ####
 # Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.
-# WARNING!!! : This should not be used for production signing as that process should follow stronger security practices (HSM / smart cards / etc)
+# WARNING!!! : This should not be used for production signing as that process should follow stronger
+#               security practices (HSM / smart cards / etc)
 #
 #  Signing is in format specified by UEFI authentacted variables
 ####
 
 
-def DetachedSignWithSignTool(SignToolPath, ToSignFilePath, SignatureOutputFile, PfxFilePath, PfxPass=None, Oid="1.2.840.113549.1.7.2", Eku=None):
+def DetachedSignWithSignTool(SignToolPath, ToSignFilePath, SignatureOutputFile, PfxFilePath,
+                             PfxPass=None, Oid="1.2.840.113549.1.7.2", Eku=None):
 
     # check signtool path
     if not os.path.exists(SignToolPath):
@@ -208,9 +211,11 @@ def DetachedSignWithSignTool(SignToolPath, ToSignFilePath, SignatureOutputFile, 
 
     OutputDir = os.path.dirname(SignatureOutputFile)
     # Signtool docs https://docs.microsoft.com/en-us/dotnet/framework/tools/signtool-exe
-    # Signtool parameters from https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/secure-boot-key-generation-and-signing-using-hsm--example
+    # Signtool parameters from
+    #   https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/secure-boot-key-generation-and-signing-using-hsm--example  # noqa: E501
     # Search for "Secure Boot Key Generation and Signing Using HSM"
-    params = 'sign /fd sha256 /p7ce DetachedSignedData /p7co ' + Oid + ' /p7 "' + OutputDir + '" /f "' + PfxFilePath + '"'
+    params = 'sign /fd sha256 /p7ce DetachedSignedData /p7co ' + Oid + ' /p7 "' + \
+             OutputDir + '" /f "' + PfxFilePath + '"'
     if Eku is not None:
         params += ' /u ' + Eku
     if PfxPass is not None:
@@ -230,7 +235,8 @@ def DetachedSignWithSignTool(SignToolPath, ToSignFilePath, SignatureOutputFile, 
 
 ####
 # Locally Sign input file using Windows SDK signtool.  This will use a local Pfx file.
-# WARNING!!! : This should not be used for production signing as that process should follow stronger security practices (HSM / smart cards / etc)
+# WARNING!!! : This should not be used for production signing as that process should follow
+#              stronger security practices (HSM / smart cards / etc)
 #
 #  Signing is catalog format which is an attached signature
 ####
