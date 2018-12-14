@@ -11,3 +11,4 @@ build.
 /cov.xml
 /test.junit.xml
 flake8.err.log
+/.eggs

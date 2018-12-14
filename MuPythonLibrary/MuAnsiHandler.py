@@ -29,11 +29,13 @@ import logging
 import re
 import os
 try:
+    # try to import windows types from winDLL
     import ctypes
     from ctypes import LibraryLoader
     windll = LibraryLoader(ctypes.WinDLL)
     from ctypes import wintypes
 except (AttributeError, ImportError):
+    # if we run into an exception (ie on unix or linux)
     windll = None
 
     # create blank lambda
@@ -45,7 +47,76 @@ except (AttributeError, ImportError):
         None
 
 else:
+    # if we don't raise an exception when we import windows types
+    # then execute this but don't catch an exception if raised
     from ctypes import byref, Structure
+
+    # inspired by https://github.com/tartley/colorama/
+    class CONSOLE_SCREEN_BUFFER_INFO(Structure):
+        COORD = wintypes._COORD
+        """struct in wincon.h."""
+        _fields_ = [
+            ("dwSize", COORD),
+            ("dwCursorPosition", COORD),
+            ("wAttributes", wintypes.WORD),
+            ("srWindow", wintypes.SMALL_RECT),
+            ("dwMaximumWindowSize", COORD),
+        ]
+
+        def __str__(self):
+            return '(%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)' % (
+                self.dwSize.Y, self.dwSize.X,
+                self.dwCursorPosition.Y, self.dwCursorPosition.X,
+                self.wAttributes,
+                self.srWindow.Top, self.srWindow.Left,
+                self.srWindow.Bottom, self.srWindow.Right,
+                self.dwMaximumWindowSize.Y, self.dwMaximumWindowSize.X
+            )
+
+    # a simple wrapper around the few methods calls to windows
+    class Win32Console(object):
+        _GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
+        _SetConsoleTextAttribute = windll.kernel32.SetConsoleTextAttribute
+        _SetConsoleTextAttribute.argtypes = [
+            wintypes.HANDLE,
+            wintypes.WORD,
+        ]
+        _SetConsoleTextAttribute.restype = wintypes.BOOL
+        _GetStdHandle = windll.kernel32.GetStdHandle
+        _GetStdHandle.argtypes = [
+            wintypes.DWORD,
+        ]
+        _GetStdHandle.restype = wintypes.HANDLE
+
+        # from winbase.h
+        STDOUT = -11
+        STDERR = -12
+
+        @staticmethod
+        def _winapi_test(handle):
+            csbi = CONSOLE_SCREEN_BUFFER_INFO()
+            success = Win32Console._GetConsoleScreenBufferInfo(
+                handle, byref(csbi))
+            return bool(success)
+
+        @staticmethod
+        def winapi_test():
+            return any(Win32Console._winapi_test(h) for h in
+                       (Win32Console._GetStdHandle(Win32Console.STDOUT),
+                        Win32Console._GetStdHandle(Win32Console.STDERR)))
+
+        @staticmethod
+        def GetConsoleScreenBufferInfo(stream_id=STDOUT):
+            handle = Win32Console._GetStdHandle(stream_id)
+            csbi = CONSOLE_SCREEN_BUFFER_INFO()
+            Win32Console._GetConsoleScreenBufferInfo(
+                handle, byref(csbi))
+            return csbi
+
+        @staticmethod
+        def SetConsoleTextAttribute(stream_id, attrs):
+            handle = Win32Console._GetStdHandle(stream_id)
+            return Win32Console._SetConsoleTextAttribute(handle, attrs)
 
 
 # from wincon.h
@@ -166,82 +237,13 @@ def get_ansi_string(color=AnsiColor.RESET):
     return CSI + str(color) + 'm'
 
 
-# inspired by https://github.com/tartley/colorama/
-class CONSOLE_SCREEN_BUFFER_INFO(Structure):
-    COORD = wintypes._COORD
-    """struct in wincon.h."""
-    _fields_ = [
-        ("dwSize", COORD),
-        ("dwCursorPosition", COORD),
-        ("wAttributes", wintypes.WORD),
-        ("srWindow", wintypes.SMALL_RECT),
-        ("dwMaximumWindowSize", COORD),
-    ]
-
-    def __str__(self):
-        return '(%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)' % (
-            self.dwSize.Y, self.dwSize.X,
-            self.dwCursorPosition.Y, self.dwCursorPosition.X,
-            self.wAttributes,
-            self.srWindow.Top, self.srWindow.Left,
-            self.srWindow.Bottom, self.srWindow.Right,
-            self.dwMaximumWindowSize.Y, self.dwMaximumWindowSize.X
-        )
-
-
-# a simple wrapper around the few methods calls to windows
-class Win32Console(object):
-    _GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
-    _SetConsoleTextAttribute = windll.kernel32.SetConsoleTextAttribute
-    _SetConsoleTextAttribute.argtypes = [
-        wintypes.HANDLE,
-        wintypes.WORD,
-    ]
-    _SetConsoleTextAttribute.restype = wintypes.BOOL
-    _GetStdHandle = windll.kernel32.GetStdHandle
-    _GetStdHandle.argtypes = [
-        wintypes.DWORD,
-    ]
-    _GetStdHandle.restype = wintypes.HANDLE
-
-    # from winbase.h
-    STDOUT = -11
-    STDERR = -12
-
-    @staticmethod
-    def _winapi_test(handle):
-        csbi = CONSOLE_SCREEN_BUFFER_INFO()
-        success = Win32Console._GetConsoleScreenBufferInfo(
-            handle, byref(csbi))
-        return bool(success)
-
-    @staticmethod
-    def winapi_test():
-        return any(Win32Console._winapi_test(h) for h in
-                   (Win32Console._GetStdHandle(Win32Console.STDOUT),
-                    Win32Console._GetStdHandle(Win32Console.STDERR)))
-
-    @staticmethod
-    def GetConsoleScreenBufferInfo(stream_id=STDOUT):
-        handle = Win32Console._GetStdHandle(stream_id)
-        csbi = CONSOLE_SCREEN_BUFFER_INFO()
-        Win32Console._GetConsoleScreenBufferInfo(
-            handle, byref(csbi))
-        return csbi
-
-    @staticmethod
-    def SetConsoleTextAttribute(stream_id, attrs):
-        handle = Win32Console._GetStdHandle(stream_id)
-        return Win32Console._SetConsoleTextAttribute(handle, attrs)
-
-
 class ColoredStreamHandler(logging.StreamHandler):
 
     # Control Sequence Introducer
     ANSI_CSI_RE = re.compile('\001?\033\\[((?:\\d|;)*)([a-zA-Z])\002?')
 
     def __init__(self, stream=None, strip=None, convert=None):
-        logging.StreamHandler.__init__(self)
+        logging.StreamHandler.__init__(self, stream)
         self.on_windows = os.name == 'nt'
         # We test if the WinAPI works, because even if we are on Windows
         # we may be using a terminal that doesn't support the WinAPI
@@ -251,23 +253,28 @@ class ColoredStreamHandler(logging.StreamHandler):
         self.strip = False
         # should we strip ANSI sequences from our output?
         if strip is None:
-            self.strip = self.conversion_supported or (
+            strip = self.conversion_supported or (
                 not self.stream.closed and not self.stream.isatty())
+        self.strip = strip
 
         # should we should convert ANSI sequences into win32 calls?
         if convert is None:
             convert = (self.conversion_supported and not self.stream.closed and self.stream.isatty())
         self.convert = convert
+        self.win32_calls = None
 
-        self.win32_calls = self.get_win32_calls()
+        if stream is not None:
+            self.stream = stream
 
-        self._light = 0
-        self._default = Win32Console.GetConsoleScreenBufferInfo(
-            Win32Console.STDOUT).wAttributes
-        self.set_attrs(self._default)
-        self._default_fore = self._fore
-        self._default_back = self._back
-        self._default_style = self._style
+        if self.on_windows:
+            self.win32_calls = self.get_win32_calls()
+            self._light = 0
+            self._default = Win32Console.GetConsoleScreenBufferInfo(
+                Win32Console.STDOUT).wAttributes
+            self.set_attrs(self._default)
+            self._default_fore = self._fore
+            self._default_back = self._back
+            self._default_style = self._style
 
     def get_win32_calls(self):
         if self.convert:
@@ -407,8 +414,13 @@ class ColoredStreamHandler(logging.StreamHandler):
     # logging.handler method we are overriding to emit a record
     def emit(self, record):
         try:
+            if record is None:
+                return
             msg = self.format(record)
-            self.write(msg + self.terminator)
+            if msg is None:
+                return
+            self.write(str(msg))
+            self.write(self.terminator)
             self.flush()
         except Exception:
             self.handleError(record)
