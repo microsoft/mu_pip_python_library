@@ -82,8 +82,9 @@ class EfiFirmwareVolumeHeader(object):
         file.seek(orig_seek)
 
         # Load this object with the contents of the data.
-        (self.ZeroVector, file_system_guid_bin, self.FvLength, self.Signature, self.Attributes, self.HeaderLength,
-         self.Checksum, self.ExtHeaderOffset, self.Reserved, self.Revision, self.Blockmap0, self.Blockmap1) = struct.unpack(self.StructString, struct_bytes)
+        (self.ZeroVector, file_system_guid_bin, self.FvLength, self.Signature, self.Attributes,
+            self.HeaderLength, self.Checksum, self.ExtHeaderOffset, self.Reserved, self.Revision,
+            self.Blockmap0, self.Blockmap1) = struct.unpack(self.StructString, struct_bytes)
 
         # Make sure that this structure is what we think it is.
         if self.Signature != EFI_FVH_SIGNATURE:
@@ -99,8 +100,9 @@ class EfiFirmwareVolumeHeader(object):
 
     def serialize(self):
         file_system_guid_bin = self.FileSystemGuid.bytes if sys.byteorder == 'big' else self.FileSystemGuid.bytes_le
-        return struct.pack(self.StructString, self.ZeroVector, file_system_guid_bin, self.FvLength, self.Signature, self.Attributes,
-                           self.HeaderLength, self.Checksum, self.ExtHeaderOffset, self.Reserved, self.Revision, self.Blockmap0, self.Blockmap1)
+        return struct.pack(self.StructString, self.ZeroVector, file_system_guid_bin, self.FvLength, self.Signature,
+                           self.Attributes, self.HeaderLength, self.Checksum, self.ExtHeaderOffset, self.Reserved,
+                           self.Revision, self.Blockmap0, self.Blockmap1)
 #
 # EFI_FIRMWARE_VOLUME_EXT_HEADER
 # Can parse or produce an EFI_FIRMWARE_VOLUME_EXT_HEADER structure/byte buffer.

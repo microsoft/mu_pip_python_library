@@ -64,10 +64,10 @@ class ModuleSummary(object):
                 line = self._RawContent[i].strip()
 
                 # parse start and end
-                if(line == ">----------------------------------------------------------------------------------------------------------------------<"):
+                if line == ">----------------------------------------------------------------------------------------------------------------------<":      # noqa: E501
                     nextLineSection = True
 
-                elif(line == "<---------------------------------------------------------------------------------------------------------------------->"):
+                elif line == "<---------------------------------------------------------------------------------------------------------------------->":    # noqa: E501
                     inPcdSection = False
                     inLibSection = False
                     inDepSection = False
@@ -324,7 +324,7 @@ class BuildReport(object):
     def _GetNextRegionStart(self, number):
         lineNumber = number
         while(lineNumber < len(self._ReportContents)):
-            if(self._ReportContents[lineNumber] == ">======================================================================================================================<"):
+            if self._ReportContents[lineNumber] == ">======================================================================================================================<":  # noqa: E501
                 return lineNumber + 1
             lineNumber += 1
         logging.debug("Failed to find a Start Next Region after lineNumber: %d" % number)
@@ -337,7 +337,7 @@ class BuildReport(object):
     def _GetEndOfRegion(self, number):
         lineNumber = number
         while(lineNumber < len(self._ReportContents)):
-            if(self._ReportContents[lineNumber] == "<======================================================================================================================>"):
+            if self._ReportContents[lineNumber] == "<======================================================================================================================>":  # noqa: E501
                 return lineNumber - 1
             lineNumber += 1
 

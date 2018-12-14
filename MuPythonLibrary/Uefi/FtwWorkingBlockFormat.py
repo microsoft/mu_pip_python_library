@@ -122,14 +122,16 @@ class EfiFtwWriteHeader(object):
         file.seek(orig_seek)
 
         # Load this object with the contents of the data.
-        (self.StatusBits, self.ReservedByte1, self.ReservedByte2, self.ReservedByte3, self.CallerId, self.ReservedUint32,
-         self.NumberOfWrites, self.PrivateDataSize) = struct.unpack(self.StructString, struct_bytes)
+        (self.StatusBits, self.ReservedByte1, self.ReservedByte2, self.ReservedByte3, self.CallerId,
+         self.ReservedUint32, self.NumberOfWrites, self.PrivateDataSize) = struct.unpack(self.StructString,
+                                                                                         struct_bytes)
 
         return self
 
     def serialize(self):
         return struct.pack(self.StructString, self.StatusBits, self.ReservedByte1, self.ReservedByte2,
-                           self.ReservedByte3, self.CallerId, self.ReservedUint32, self.NumberOfWrites, self.PrivateDataSize)
+                           self.ReservedByte3, self.CallerId, self.ReservedUint32, self.NumberOfWrites,
+                           self.PrivateDataSize)
 
 #
 # EFI Fault tolerant block update write queue record.
@@ -174,4 +176,5 @@ class EfiFtwWriteRecord(object):
 
     def serialize(self):
         return struct.pack(self.StructString, self.StatusBits, self.ReservedByte1, self.ReservedByte2,
-                           self.ReservedByte3, self.ReservedUint32, self.Lba, self.Offset, self.Length, self.RelativeOffset)
+                           self.ReservedByte3, self.ReservedUint32, self.Lba, self.Offset, self.Length,
+                           self.RelativeOffset)

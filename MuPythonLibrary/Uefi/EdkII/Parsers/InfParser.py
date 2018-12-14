@@ -28,7 +28,8 @@ from MuPythonLibrary.Uefi.EdkII.Parsers.BaseParser import HashFileParser
 import os
 
 
-AllPhases = ["SEC", "PEIM", "PEI_CORE", "DXE_DRIVER", "DXE_CORE", "DXE_RUNTIME_DRIVER", "UEFI_DRIVER", "SMM_CORE", "DXE_SMM_DRIVER", "UEFI_APPLICATION"]
+AllPhases = ["SEC", "PEIM", "PEI_CORE", "DXE_DRIVER", "DXE_CORE", "DXE_RUNTIME_DRIVER", "UEFI_DRIVER",
+             "SMM_CORE", "DXE_SMM_DRIVER", "UEFI_APPLICATION"]
 
 
 class InfParser(HashFileParser):
@@ -175,7 +176,10 @@ class InfParser(HashFileParser):
             elif sline.strip().lower().startswith('[guids'):
                 InGuidsSection = True
 
-            elif sline.strip().lower().startswith('[pcd') or sline.strip().lower().startswith('[patchpcd') or sline.strip().lower().startswith('[fixedpcd') or sline.strip().lower().startswith('[featurepcd'):
+            elif sline.strip().lower().startswith('[pcd') or \
+                    sline.strip().lower().startswith('[patchpcd') or \
+                    sline.strip().lower().startswith('[fixedpcd') or \
+                    sline.strip().lower().startswith('[featurepcd'):
                 InPcdSection = True
 
             elif sline.strip().lower().startswith('[sources'):

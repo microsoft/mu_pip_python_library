@@ -147,8 +147,9 @@ class DMAR_TABLE(object):
       Creator ID         : %s
       Creator Revision   : 0x%08X
       Host Address Width : 0x%02X
-      Flags              : 0x%02X
-    """ % (self.Signature, self.Length, self.Revision, self.Checksum, self.OEMID, self.OEMTableID, self.OEMRevision, self.CreatorID, self.CreatorRevision, self.HostAddressWidth, self.Flags)
+      Flags              : 0x%02X\n""" % (self.Signature, self.Length, self.Revision, self.Checksum,
+                                          self.OEMID, self.OEMTableID, self.OEMRevision, self.CreatorID,
+                                          self.CreatorRevision, self.HostAddressWidth, self.Flags)
 
         def toXml(self):
             xml_repr = ET.Element('AcpiTableHeader')
@@ -245,7 +246,8 @@ class DMAR_TABLE(object):
              self.Reserved,
              self.SegmentNumber,
              self.ReservedMemoryBaseAddress,
-             self.ReservedMemoryRegionLimitAddress) = struct.unpack_from(DMAR_TABLE.RMRR_STRUCT.struct_format, header_byte_array)
+             self.ReservedMemoryRegionLimitAddress) = struct.unpack_from(DMAR_TABLE.RMRR_STRUCT.struct_format,
+                                                                         header_byte_array)
 
             # Get Sub Structs
             self.DeviceScope = list()
@@ -293,8 +295,9 @@ class DMAR_TABLE(object):
       Reserved                             : 0x%04X
       Segment Number                       : 0x%04x
       Reserved Memory Base Address         : 0x%016x
-      Reserved Memory Region Limit Address : 0x%016x
-    """ % (self.Type, self.Length, self.Reserved, self.SegmentNumber, self.ReservedMemoryBaseAddress, self.ReservedMemoryRegionLimitAddress)
+      Reserved Memory Region Limit Address : 0x%016x\n""" % (self.Type, self.Length, self.Reserved,
+                                                             self.SegmentNumber, self.ReservedMemoryBaseAddress,
+                                                             self.ReservedMemoryRegionLimitAddress)
 
             for item in self.DeviceScope:
                 retstring += str(item)
@@ -455,7 +458,8 @@ class DMAR_TABLE(object):
             offset = 6
             self.Path = list()
             while number_path_entries > 0:
-                self.Path.append((struct.unpack("<B", header_byte_array[offset:offset + 1]), struct.unpack("<B", header_byte_array[offset + 1:offset + 2])))
+                self.Path.append((struct.unpack("<B", header_byte_array[offset:offset + 1]),
+                                  struct.unpack("<B", header_byte_array[offset + 1:offset + 2])))
                 offset += 2
                 number_path_entries -= 1
 
@@ -477,7 +481,8 @@ class DMAR_TABLE(object):
     \t\t  Reserved              : 0x%04X
     \t\t  Enumeration ID        : 0x%02x
     \t\t  Start Bus Number      : 0x%02x
-    \t\t  Path                  : """ % (self.TypeString, self.Type, self.Length, self.Reserved, self.EnumerationID, self.StartBusNumber)
+    \t\t  Path                  : """ % (self.TypeString, self.Type, self.Length, self.Reserved,
+                                         self.EnumerationID, self.StartBusNumber)
 
             retstring += "%02d" % self.StartBusNumber + ":"
             for (index, item) in enumerate(self.Path):

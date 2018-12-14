@@ -1,5 +1,6 @@
 '''
-Quick script to check that the wheel/package created is aligned on a git tag.  Official releases should not be made from non-tagged code.
+Quick script to check that the wheel/package created is aligned on a git tag.
+Official releases should not be made from non-tagged code.
 '''
 
 import glob

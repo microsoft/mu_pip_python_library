@@ -91,8 +91,10 @@ class TestPolicyCommandCode(unittest.TestCase):
         self.assertEqual(policy.get_code(), 'TPM_CC_Quote')
 
     def test_get_buffer(self):
-        self.assertEqual(t2pc.PolicyCommandCode('TPM_CC_Clear').get_buffer_for_digest(), bytearray.fromhex("0000016C" + "00000126"))
-        self.assertEqual(t2pc.PolicyCommandCode('TPM_CC_ClearControl').get_buffer_for_digest(), bytearray.fromhex("0000016C" + "00000127"))
+        self.assertEqual(t2pc.PolicyCommandCode('TPM_CC_Clear').get_buffer_for_digest(),
+                         bytearray.fromhex("0000016C" + "00000126"))
+        self.assertEqual(t2pc.PolicyCommandCode('TPM_CC_ClearControl').get_buffer_for_digest(),
+                         bytearray.fromhex("0000016C" + "00000127"))
 
 
 class TestPolicyTreeSolo(unittest.TestCase):
