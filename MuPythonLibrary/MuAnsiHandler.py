@@ -257,7 +257,7 @@ class ColoredStreamHandler(logging.StreamHandler):
             convert = (self.conversion_supported and not self.stream.closed and self.stream.isatty())
         self.convert = convert
         self.win32_calls = None
-        
+
         if self.on_windows:
             self.win32_calls = self.get_win32_calls()
             self._light = 0
