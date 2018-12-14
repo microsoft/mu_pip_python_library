@@ -47,6 +47,73 @@ except (AttributeError, ImportError):
 else:
     from ctypes import byref, Structure
 
+    # inspired by https://github.com/tartley/colorama/
+    class CONSOLE_SCREEN_BUFFER_INFO(Structure):
+        COORD = wintypes._COORD
+        """struct in wincon.h."""
+        _fields_ = [
+            ("dwSize", COORD),
+            ("dwCursorPosition", COORD),
+            ("wAttributes", wintypes.WORD),
+            ("srWindow", wintypes.SMALL_RECT),
+            ("dwMaximumWindowSize", COORD),
+        ]
+
+        def __str__(self):
+            return '(%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)' % (
+                self.dwSize.Y, self.dwSize.X,
+                self.dwCursorPosition.Y, self.dwCursorPosition.X,
+                self.wAttributes,
+                self.srWindow.Top, self.srWindow.Left,
+                self.srWindow.Bottom, self.srWindow.Right,
+                self.dwMaximumWindowSize.Y, self.dwMaximumWindowSize.X
+            )
+
+    # a simple wrapper around the few methods calls to windows
+    class Win32Console(object):
+        _GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
+        _SetConsoleTextAttribute = windll.kernel32.SetConsoleTextAttribute
+        _SetConsoleTextAttribute.argtypes = [
+            wintypes.HANDLE,
+            wintypes.WORD,
+        ]
+        _SetConsoleTextAttribute.restype = wintypes.BOOL
+        _GetStdHandle = windll.kernel32.GetStdHandle
+        _GetStdHandle.argtypes = [
+            wintypes.DWORD,
+        ]
+        _GetStdHandle.restype = wintypes.HANDLE
+
+        # from winbase.h
+        STDOUT = -11
+        STDERR = -12
+
+        @staticmethod
+        def _winapi_test(handle):
+            csbi = CONSOLE_SCREEN_BUFFER_INFO()
+            success = Win32Console._GetConsoleScreenBufferInfo(
+                handle, byref(csbi))
+            return bool(success)
+
+        @staticmethod
+        def winapi_test():
+            return any(Win32Console._winapi_test(h) for h in
+                       (Win32Console._GetStdHandle(Win32Console.STDOUT),
+                        Win32Console._GetStdHandle(Win32Console.STDERR)))
+
+        @staticmethod
+        def GetConsoleScreenBufferInfo(stream_id=STDOUT):
+            handle = Win32Console._GetStdHandle(stream_id)
+            csbi = CONSOLE_SCREEN_BUFFER_INFO()
+            Win32Console._GetConsoleScreenBufferInfo(
+                handle, byref(csbi))
+            return csbi
+
+        @staticmethod
+        def SetConsoleTextAttribute(stream_id, attrs):
+            handle = Win32Console._GetStdHandle(stream_id)
+            return Win32Console._SetConsoleTextAttribute(handle, attrs)
+
 
 # from wincon.h
 class WinColor(object):
@@ -166,75 +233,6 @@ def get_ansi_string(color=AnsiColor.RESET):
     return CSI + str(color) + 'm'
 
 
-# inspired by https://github.com/tartley/colorama/
-class CONSOLE_SCREEN_BUFFER_INFO(Structure):
-    COORD = wintypes._COORD
-    """struct in wincon.h."""
-    _fields_ = [
-        ("dwSize", COORD),
-        ("dwCursorPosition", COORD),
-        ("wAttributes", wintypes.WORD),
-        ("srWindow", wintypes.SMALL_RECT),
-        ("dwMaximumWindowSize", COORD),
-    ]
-
-    def __str__(self):
-        return '(%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)' % (
-            self.dwSize.Y, self.dwSize.X,
-            self.dwCursorPosition.Y, self.dwCursorPosition.X,
-            self.wAttributes,
-            self.srWindow.Top, self.srWindow.Left,
-            self.srWindow.Bottom, self.srWindow.Right,
-            self.dwMaximumWindowSize.Y, self.dwMaximumWindowSize.X
-        )
-
-
-# a simple wrapper around the few methods calls to windows
-class Win32Console(object):
-    _GetConsoleScreenBufferInfo = windll.kernel32.GetConsoleScreenBufferInfo
-    _SetConsoleTextAttribute = windll.kernel32.SetConsoleTextAttribute
-    _SetConsoleTextAttribute.argtypes = [
-        wintypes.HANDLE,
-        wintypes.WORD,
-    ]
-    _SetConsoleTextAttribute.restype = wintypes.BOOL
-    _GetStdHandle = windll.kernel32.GetStdHandle
-    _GetStdHandle.argtypes = [
-        wintypes.DWORD,
-    ]
-    _GetStdHandle.restype = wintypes.HANDLE
-
-    # from winbase.h
-    STDOUT = -11
-    STDERR = -12
-
-    @staticmethod
-    def _winapi_test(handle):
-        csbi = CONSOLE_SCREEN_BUFFER_INFO()
-        success = Win32Console._GetConsoleScreenBufferInfo(
-            handle, byref(csbi))
-        return bool(success)
-
-    @staticmethod
-    def winapi_test():
-        return any(Win32Console._winapi_test(h) for h in
-                   (Win32Console._GetStdHandle(Win32Console.STDOUT),
-                    Win32Console._GetStdHandle(Win32Console.STDERR)))
-
-    @staticmethod
-    def GetConsoleScreenBufferInfo(stream_id=STDOUT):
-        handle = Win32Console._GetStdHandle(stream_id)
-        csbi = CONSOLE_SCREEN_BUFFER_INFO()
-        Win32Console._GetConsoleScreenBufferInfo(
-            handle, byref(csbi))
-        return csbi
-
-    @staticmethod
-    def SetConsoleTextAttribute(stream_id, attrs):
-        handle = Win32Console._GetStdHandle(stream_id)
-        return Win32Console._SetConsoleTextAttribute(handle, attrs)
-
-
 class ColoredStreamHandler(logging.StreamHandler):
 
     # Control Sequence Introducer
@@ -258,16 +256,17 @@ class ColoredStreamHandler(logging.StreamHandler):
         if convert is None:
             convert = (self.conversion_supported and not self.stream.closed and self.stream.isatty())
         self.convert = convert
-
-        self.win32_calls = self.get_win32_calls()
-
-        self._light = 0
-        self._default = Win32Console.GetConsoleScreenBufferInfo(
-            Win32Console.STDOUT).wAttributes
-        self.set_attrs(self._default)
-        self._default_fore = self._fore
-        self._default_back = self._back
-        self._default_style = self._style
+        self.win32_calls = None
+        
+        if self.on_windows:
+            self.win32_calls = self.get_win32_calls()
+            self._light = 0
+            self._default = Win32Console.GetConsoleScreenBufferInfo(
+                Win32Console.STDOUT).wAttributes
+            self.set_attrs(self._default)
+            self._default_fore = self._fore
+            self._default_back = self._back
+            self._default_style = self._style
 
     def get_win32_calls(self):
         if self.convert:
