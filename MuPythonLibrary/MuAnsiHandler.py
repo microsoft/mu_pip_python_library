@@ -419,4 +419,4 @@ class ColoredStreamHandler(logging.StreamHandler):
             self.write(self.terminator)
             self.flush()
         except Exception:
-            self.handleError(record
+            self.handleError(record)
