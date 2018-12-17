@@ -125,7 +125,8 @@ class DscParser(HashFileParser):
                     p = self.ParseInfPathMod(line_resolved)
                     self.ThreeMods.append(p)
                     if file_name is not None and lineno is not None:
-                        self.ThreeModsEnhanced.append({'file': os.path.normpath(file_name), 'lineno': lineno, 'data': p})
+                        self.ThreeModsEnhanced.append({'file': os.path.normpath(file_name),
+                                                       'lineno': lineno, 'data': p})
                     self.Logger.debug("Found 32bit Module: %s" % p)
 
             self.ParsingInBuildOption = self.ParsingInBuildOption + line_resolved.count("{")
