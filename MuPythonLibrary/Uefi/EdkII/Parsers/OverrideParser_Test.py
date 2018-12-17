@@ -27,7 +27,8 @@
 
 import unittest
 import os
-import OverrideParser as op
+
+from MuPythonLibrary.Uefi.EdkII.Parsers import OverrideParser as op
 
 SAMPLE_DATA_SINGLE_OVERRIDE = """#Override : 00000001 | My/Path/1 | 4e367990b327501d1ea6fbee4002f9c8 | 2018-11-27T22-36-30"""  # noqa: E501
 
