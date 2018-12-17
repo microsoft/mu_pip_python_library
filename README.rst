@@ -26,5 +26,3 @@ Updated documentation and release process.  Transition to Beta.
 -------
 
 Alpha development
-
-[![Build Status](https://dev.azure.com/projectmu/mu%20pip/_apis/build/status/PythonLibrary/Mu%20Pip%20Python%20Library%20-%20PR%20Gate%20(Windows)?branchName=master)](https://dev.azure.com/projectmu/mu%20pip/_build/latest?definitionId=13?branchName=master)
