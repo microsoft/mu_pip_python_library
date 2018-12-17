@@ -56,9 +56,14 @@ steps:
     reportDirectory: $(System.DefaultWorkingDirectory)/cov_html
   condition: succeededOrFailed()
 
-- script: flake8 . > flake8.err.log
+- script: flake8 .
   displayName: 'Run flake8'
   condition: succeededOrFailed()
+
+# Only capture and archive the lint log on failures.
+- script: flake8 . > flake8.err.log
+  displayName: 'Capture flake8 failures'
+  condition: Failed()
 
 - task: PublishBuildArtifacts@1
   inputs:
