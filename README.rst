@@ -17,6 +17,22 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.4.0
+-----
+
+Main changes:
+- Add the OverrideParser class and tests.
+- Update DscParser to include the enhanced provenance.
+
+Bug fixes:
+- Clean up the README.rst file.
+- Update CI pipeline to report flake results more conveniently.
+
+0.3.1
+-----
+
+Bug fixes to enable module to pass both sets of CI gates (Windows and Linux).
+
 0.3.0
 -----
 
