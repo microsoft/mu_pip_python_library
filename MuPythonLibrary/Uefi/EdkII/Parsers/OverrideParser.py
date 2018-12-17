@@ -1,6 +1,6 @@
 ## @file OverrideParser.py
 # Contains classes to help with the parsing of INF files that
-# make contain OVERRIDE information.
+# may contain OVERRIDE information.
 #
 ##
 # Copyright (c) 2018, Microsoft Corporation
@@ -92,7 +92,7 @@ class OverrideParser(object):
         if not parse_contents:
             raise ValueError("Failed to read contents of file '%s'." % self.file_path)
 
-        self.override_lines = self._get_override_lines(parse_contents)
+        self.override_lines = self.get_override_lines(parse_contents)
 
         # If no override lines were found, we're basically done here.
         if not self.override_lines:
@@ -101,13 +101,13 @@ class OverrideParser(object):
         self.overrides = []
         for override_line in self.override_lines:
             try:
-                self.overrides.append(self._parse_override_line(override_line['line']))
+                self.overrides.append(self.parse_override_line(override_line['line']))
             except OpParseError as pe:
                 raise ValueError("Parse error '%s' occurred while processing line %d of '%s'." %
                                  (pe, override_line['lineno'], override_line['line']))
 
     @staticmethod
-    def _get_override_lines(parse_contents):
+    def get_override_lines(parse_contents):
         parse_lines = parse_contents.split('\n')
         result = []
 
@@ -118,7 +118,7 @@ class OverrideParser(object):
         return result
 
     @staticmethod
-    def _parse_override_line(line_contents):
+    def parse_override_line(line_contents):
         result = {}
 
         # Split the override string into pieces.
