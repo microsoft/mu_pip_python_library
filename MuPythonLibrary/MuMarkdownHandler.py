@@ -28,7 +28,7 @@ import logging
 
 
 class MarkdownFileHandler(logging.FileHandler):
-    def __init__(self, filename, mode='a'):
+    def __init__(self, filename, mode='w+'):
         logging.FileHandler.__init__(self, filename, mode=mode)
         if self.stream.writable:
             self.stream.write("# Build Report\n [Go to table of contents](#table-of-contents)\n=====\n")
