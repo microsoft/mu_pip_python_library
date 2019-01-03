@@ -33,6 +33,7 @@ class MarkdownFileHandler(logging.FileHandler):
         if self.stream.writable:
             self.stream.write("# Build Report\n [Go to table of contents](#table-of-contents)\n=====\n")
         self.contents = []
+        self.table_written = False
 
     def emit(self, record):
         if self.stream is None:
@@ -72,12 +73,17 @@ class MarkdownFileHandler(logging.FileHandler):
         return text
 
     def close(self):
-        self.stream.write("## Table of Contents\n")
-        for item, subsections in self.contents:
-            link = MarkdownFileHandler.__convert_to_markdownlink(item)
-            self.stream.write("+ [{0}](#{1})\n".format(item, link))
-            for section in subsections:
-                section_link = MarkdownFileHandler.__convert_to_markdownlink(section)
-                self.stream.write("  + [{0}](#{1})\n".format(section, section_link))
+        # make sure we don't write the table of contents twice
+        if not self.table_written:
+            self.table_written = True
 
-        self.flush()
+            self.stream.write("## Table of Contents\n")
+            for item, subsections in self.contents:
+                link = MarkdownFileHandler.__convert_to_markdownlink(item)
+                self.stream.write("+ [{0}](#{1})\n".format(item, link))
+                for section in subsections:
+                    section_link = MarkdownFileHandler.__convert_to_markdownlink(section)
+                    self.stream.write("  + [{0}](#{1})\n".format(section, section_link))
+
+            self.flush()
+        self.stream.close()
