@@ -91,16 +91,20 @@ def reader(filepath, outstream, stream):
 
 
 def GetNugetCmd():
-    file = "nuget.exe"
+    file = "NuGet.exe"
     cmd = []
     if (os.name == "posix"):
         cmd += ["mono"]
+        found = False
         for env_var in os.getenv("PATH").split(os.pathsep):
-            env_var = os.path.normpath(env_var)
-            if os.path.isfile(os.path.join(env_var, file)):
-                file = "\"" + os.path.join(env_var, file) + "\""
-                logging.debug("File was found on the path: %s" % file)
+            env_var = '"' + os.path.join(os.path.normpath(env_var), file) + '"'
+            if os.path.isfile(env_var):
+                file = env_var
+                logging.info("File was found on the path: %s" % file)
+                found = True
                 break
+        if not found:
+            raise Exception("NuGet.exe not found on path")
     cmd += [file]
     return cmd
 
