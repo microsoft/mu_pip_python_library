@@ -42,11 +42,12 @@ class Edk2Path(object):
     #
     def __init__(self, ws, packagepathlist):
         self.WorkspacePath = ws
+        self.logger = logging.getLogger("Edk2Path")
         if(not os.path.isabs(ws)):
             self.WorkspacePath = os.path.abspath(os.path.join(os.getcwd(), ws))
 
         if(not os.path.isdir(self.WorkspacePath)):
-            logging.error("Workspace path invalid.  {0}".format(ws))
+            self.logger.error("Workspace path invalid.  {0}".format(ws))
             raise Exception("Workspace path invalid.  {0}".format(ws))
 
         # Set PackagePath
@@ -66,7 +67,7 @@ class Edk2Path(object):
         error = False
         for a in self.PackagePathList:
             if(not os.path.isdir(a)):
-                logging.error("Invalid package path entry {0}".format(a))
+                self.logger.error("Invalid package path entry {0}".format(a))
                 error = True
 
         # report error
@@ -84,8 +85,8 @@ class Edk2Path(object):
                 # found our path...now lets correct for case
                 relpath = abspath[len(a):]
                 found = True
-                logging.debug("Successfully converted AbsPath to Edk2Relative Path using PackagePath")
-                logging.debug("AbsolutePath: %s found in PackagePath: %s" % (abspath, a))
+                self.logger.debug("Successfully converted AbsPath to Edk2Relative Path using PackagePath")
+                self.logger.debug("AbsolutePath: %s found in PackagePath: %s" % (abspath, a))
                 break
 
         if(not found):
@@ -95,16 +96,16 @@ class Edk2Path(object):
                 # found our path...now lets correct for case
                 relpath = abspath[len(self.WorkspacePath):]
                 found = True
-                logging.debug("Successfully converted AbsPath to Edk2Relative Path using WorkspacePath")
-                logging.debug("AbsolutePath: %s found in Workspace: %s" % (abspath, self.WorkspacePath))
+                self.logger.debug("Successfully converted AbsPath to Edk2Relative Path using WorkspacePath")
+                self.logger.debug("AbsolutePath: %s found in Workspace: %s" % (abspath, self.WorkspacePath))
 
         if(found):
             relpath = relpath.replace(os.sep, "/")
             return relpath.lstrip("/")
 
         # didn't find the path for conversion.
-        logging.error("Failed to convert AbsPath to Edk2Relative Path")
-        logging.error("AbsolutePath: %s" % abspath)
+        self.logger.error("Failed to convert AbsPath to Edk2Relative Path")
+        self.logger.error("AbsolutePath: %s" % abspath)
         return None
 
     def GetAbsolutePathOnThisSytemFromEdk2RelativePath(self, relpath):
@@ -117,8 +118,8 @@ class Edk2Path(object):
             abspath = os.path.join(a, relpath)
             if(os.path.exists(abspath)):
                 return abspath
-        logging.error("Failed to convert Edk2Relative Path to an Absolute Path on this system.")
-        logging.error("Relative Path: %s" % relpath)
+        self.logger.error("Failed to convert Edk2Relative Path to an Absolute Path on this system.")
+        self.logger.error("Relative Path: %s" % relpath)
 
         return None
 
@@ -130,7 +131,7 @@ class Edk2Path(object):
     #
     # @ret Name of Package that the module is in.
     def GetContainingPackage(self, InputPath):
-        logging.debug("GetContainingPackage: %s" % InputPath)
+        self.logger.debug("GetContainingPackage: %s" % InputPath)
 
         dirpathprevious = os.path.dirname(InputPath)
         dirpath = os.path.dirname(InputPath)
@@ -141,7 +142,7 @@ class Edk2Path(object):
             #
             if(dirpath in self.PackagePathList):
                 a = os.path.basename(dirpathprevious)
-                logging.debug("Reached Package Path.  Using previous directory: %s" % a)
+                self.logger.debug("Reached Package Path.  Using previous directory: %s" % a)
                 return a
             #
             # if at the root of the workspace return the previous dir.
@@ -149,7 +150,7 @@ class Edk2Path(object):
             #
             if(dirpath == self.WorkspacePath):
                 a = os.path.basename(dirpathprevious)
-                logging.debug("Reached Workspace Path.  Using previous directory: %s" % a)
+                self.logger.debug("Reached Workspace Path.  Using previous directory: %s" % a)
                 return a
             #
             # Check for a DEC file in this folder
@@ -158,13 +159,13 @@ class Edk2Path(object):
             for f in os.listdir(dirpath):
                 if fnmatch.fnmatch(f, '*.dec'):
                     a = os.path.basename(dirpath)
-                    logging.debug("Found DEC file at %s.  Pkg is: %s", dirpath, a)
+                    self.logger.debug("Found DEC file at %s.  Pkg is: %s", dirpath, a)
                     return a
 
             dirpathprevious = dirpath
             dirpath = os.path.dirname(dirpath)
 
-        logging.error("Failed to find containing package for %s" % InputPath)
-        logging.info("PackagePath is: %s" % os.pathsep.join(self.PackagePathList))
-        logging.info("Workspace path is : %s" % self.WorkspacePath)
+        self.logger.error("Failed to find containing package for %s" % InputPath)
+        self.logger.info("PackagePath is: %s" % os.pathsep.join(self.PackagePathList))
+        self.logger.info("Workspace path is : %s" % self.WorkspacePath)
         return None

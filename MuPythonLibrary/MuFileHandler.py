@@ -1,5 +1,5 @@
-# @file MuStringHandler.py
-# Handle basic logging by streaming into stringIO
+# @file MuAnsiHandler.py
+# Handle basic logging outputting to files
 ##
 # Copyright (c) 2018, Microsoft Corporation
 #
@@ -25,18 +25,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ##
 import logging
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
 
 
-class StringStreamHandler(logging.StreamHandler):
-    terminator = '\n'
-
-    def __init__(self):
-        logging.Handler.__init__(self)
-        self.stream = StringIO()
+class FileHandler(logging.FileHandler):
+    def __init__(self, filename, mode='w+'):
+        logging.FileHandler.__init__(self, filename, mode=mode)
 
     def handle(self, record):
         """
@@ -55,15 +48,3 @@ class StringStreamHandler(logging.StreamHandler):
             finally:
                 self.release()
         return rv
-
-    def readlines(self, hint=-1):
-        return self.stream.readlines(hint)
-
-    def seek_start(self):
-        self.stream.seek(0, 0)
-
-    def seek_end(self):
-        self.stream.seek(2, 0)
-
-    def seek(self, offset, whence):
-        return self.stream.seek(offset, whence)
