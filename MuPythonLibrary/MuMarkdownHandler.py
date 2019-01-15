@@ -31,9 +31,13 @@ class MarkdownFileHandler(logging.FileHandler):
     def __init__(self, filename, mode='w+'):
         logging.FileHandler.__init__(self, filename, mode=mode)
         if self.stream.writable:
-            self.stream.write("# Build Report\n [Go to table of contents](#table-of-contents)\n=====\n")
+            self.stream.write("  # Build Report\n")
+            self.stream.write("[Go to table of contents](#table-of-contents)\n")
+            self.stream.write("=====\n")
+            self.stream.write(" [Go to Error List](#error-list)\n")
+            self.stream.write("=====\n")
         self.contents = []
-        self.table_written = False
+        self.error_records = []
 
     def emit(self, record):
         if self.stream is None:
@@ -50,9 +54,10 @@ class MarkdownFileHandler(logging.FileHandler):
                     self.contents[section_index][1].append(msg)
                 msg = "### " + msg
             elif record.levelno == logging.ERROR:
-                msg = "#### " + msg
+                self.error_records.append(record)
+                msg = "#### ERROR: " + msg
             elif record.levelno == logging.WARNING:
-                msg = "  _" + msg + "_"
+                msg = "  _ WARNING: " + msg + "_"
             else:
                 msg = "    " + msg
             stream = self.stream
@@ -72,18 +77,24 @@ class MarkdownFileHandler(logging.FileHandler):
         text = text.replace(" ", "-")
         return text
 
+    def _output_error(self, record):
+        output = " + \"{0}\" from {1}:{2}\n".format(record.msg, record.pathname, record.lineno)
+        self.stream.write(output)
+
     def close(self):
-        # make sure we don't write the table of contents twice
-        if not self.table_written:
-            self.table_written = True
+        self.stream.write("## Table of Contents\n")
+        for item, subsections in self.contents:
+            link = MarkdownFileHandler.__convert_to_markdownlink(item)
+            self.stream.write("+ [{0}](#{1})\n".format(item, link))
+            for section in subsections:
+                section_link = MarkdownFileHandler.__convert_to_markdownlink(section)
+                self.stream.write("  + [{0}](#{1})\n".format(section, section_link))
 
-            self.stream.write("## Table of Contents\n")
-            for item, subsections in self.contents:
-                link = MarkdownFileHandler.__convert_to_markdownlink(item)
-                self.stream.write("+ [{0}](#{1})\n".format(item, link))
-                for section in subsections:
-                    section_link = MarkdownFileHandler.__convert_to_markdownlink(section)
-                    self.stream.write("  + [{0}](#{1})\n".format(section, section_link))
+        self.stream.write("## Error List\n")
+        if len(self.error_records) == 0:
+            self.stream.write("   No errors found")
+        for record in self.error_records:
+            self._output_error(record)
 
-            self.flush()
+        self.flush()
         self.stream.close()
