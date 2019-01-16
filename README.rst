@@ -17,6 +17,19 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.4.1
+-----
+
+Main changes:
+- Keep track of errors that occur during the build process and display the list at the very end to make errors easier to locate in the log.
+- Added a filter, which gets evaluated before level, that allows specific modules to either be raised or lowered in level before being output to the log.
+
+Bug fixes:
+- Change FileHandler mode to avoid appending a new log to an existing log.
+- Change MuMarkdownHanlder close routine to avoid writing the table of contents twice.
+- Change NuGet.exe case to match the executable exactly.
+- On Posix systems, throw exception if NuGet.exe is not found on the path instead of failing silently.
+
 0.4.0
 -----
 
