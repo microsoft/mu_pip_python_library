@@ -97,9 +97,9 @@ def GetNugetCmd():
         cmd += ["mono"]
         found = False
         for env_var in os.getenv("PATH").split(os.pathsep):
-            env_var = '"' + os.path.join(os.path.normpath(env_var), file) + '"'
+            env_var = os.path.join(os.path.normpath(env_var), file)
             if os.path.isfile(env_var):
-                file = env_var
+                file = '"' + env_var + '"'
                 logging.info("File was found on the path: %s" % file)
                 found = True
                 break
