@@ -17,14 +17,21 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.4.2
+-----
+
+Bug fix around quoted paths for Nuget
+
 0.4.1
 -----
 
 Main changes:
+
 - Keep track of errors that occur during the build process and display the list at the very end to make errors easier to locate in the log.
 - Added a filter, which gets evaluated before level, that allows specific modules to either be raised or lowered in level before being output to the log.
 
 Bug fixes:
+
 - Change FileHandler mode to avoid appending a new log to an existing log.
 - Change MuMarkdownHanlder close routine to avoid writing the table of contents twice.
 - Change NuGet.exe case to match the executable exactly.
@@ -34,10 +41,12 @@ Bug fixes:
 -----
 
 Main changes:
+
 - Add the OverrideParser class and tests.
 - Update DscParser to include the enhanced provenance.
 
 Bug fixes:
+
 - Clean up the README.rst file.
 - Update CI pipeline to report flake results more conveniently.
 
