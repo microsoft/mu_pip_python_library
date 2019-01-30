@@ -75,6 +75,9 @@ steps:
 - script: pip install --upgrade -r requirements.publisher.txt
   displayName: 'Install PyPI publishing requirements'
 
+- script: pip install "pyopenssl>=18.0.0,<19.0.0"
+  displayName: 'Backdating pyOpenSSL'
+
 - script: python setup.py sdist bdist_wheel
   displayName: 'Build a wheel'
 
