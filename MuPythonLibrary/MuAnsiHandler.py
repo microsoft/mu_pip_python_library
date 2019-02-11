@@ -195,9 +195,11 @@ class ColoredFormatter(logging.Formatter):
         'WARNING': AnsiColor.YELLOW,
         'INFO': AnsiColor.CYAN,
         'DEBUG': AnsiColor.BLUE,
-        'CRITICAL': AnsiColor.GREEN,
+        'CRITICAL': AnsiColor.MAGENTA,
         'ERROR': AnsiColor.RED,
-        "STATUS": AnsiColor.MAGENTA
+        "STATUS": AnsiColor.GREEN,
+        "PROGRESS": AnsiColor.GREEN,
+        "SECTION": AnsiColor.CYAN
     }
 
     def __init__(self, msg="", use_azure=False):
@@ -209,8 +211,10 @@ class ColoredFormatter(logging.Formatter):
         org_message = record.msg
 
         if not self.use_azure and levelname in ColoredFormatter.COLORS:
+            # just color the level name
             if record.levelno < logging.WARNING:
                 levelname_color = get_ansi_string(ColoredFormatter.COLORS[levelname]) + levelname + get_ansi_string()
+            # otherwise color the wholes message
             else:
                 levelname_color = get_ansi_string(ColoredFormatter.COLORS[levelname]) + levelname
                 record.msg += get_ansi_string()

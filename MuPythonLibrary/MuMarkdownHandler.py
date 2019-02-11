@@ -45,7 +45,7 @@ class MarkdownFileHandler(logging.FileHandler):
         msg = record.message.strip("#- ")
 
         if len(msg) > 0:
-            if logging.getLevelName(record.levelno) is "SECTION":
+            if logging.getLevelName(record.levelno) == "SECTION":
                 self.contents.append((msg, []))
                 msg = "## " + msg
             elif record.levelno == logging.CRITICAL:

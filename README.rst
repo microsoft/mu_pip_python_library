@@ -17,6 +17,11 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.4.3-dev
+-----
+Main Changes:
+- Added colors for progress and section labels.
+
 0.4.2
 -----
 
