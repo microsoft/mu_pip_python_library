@@ -19,7 +19,10 @@ Version History
 
 0.4.3-dev
 -----
+
 Main Changes:
+
+- Added GetHostInfo to UtilityFunctions. This function will parse the platform module to provide information about the host.
 - Added colors for progress and section labels.
 
 0.4.2

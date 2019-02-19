@@ -13,6 +13,8 @@ import shutil
 import threading
 import subprocess
 import sys
+import platform
+from collections import namedtuple
 
 ####
 # Helper to allow Enum type to be used which allows better code readability
@@ -93,7 +95,7 @@ def reader(filepath, outstream, stream):
 def GetNugetCmd():
     file = "NuGet.exe"
     cmd = []
-    if (os.name == "posix"):
+    if (GetHostInfo().os == "Linux"):
         cmd += ["mono"]
         found = False
         for env_var in os.getenv("PATH").split(os.pathsep):
@@ -107,6 +109,37 @@ def GetNugetCmd():
             raise Exception("NuGet.exe not found on path")
     cmd += [file]
     return cmd
+
+
+####
+# Returns a namedtuple containing information about host machine.
+#
+# @return namedtuple Host(os=OS Type, arch=System Architecture, bit=Highest Order Bit)
+####
+def GetHostInfo():
+    Host = namedtuple('Host', 'os arch bit')
+    host_info = platform.uname()
+    os = host_info.system
+    processor_info = host_info.machine
+    logging.debug("Getting host info for host: {0}".format(str(host_info)))
+
+    arch = None
+    bit = None
+
+    if ("x86" in processor_info) or ("AMD" in processor_info) or ("Intel" in processor_info):
+        arch = "x86"
+    elif ("ARM" in processor_info) or ("AARCH" in processor_info):
+        arch = "ARM"
+
+    if "32" in processor_info:
+        bit = "32"
+    elif "64" in processor_info:
+        bit = "64"
+
+    if (arch is None) or (bit is None):
+        raise EnvironmentError("Host info could not be parsed: {0}".format(str(host_info)))
+
+    return Host(os=os, arch=arch, bit=bit)
 
 
 ####

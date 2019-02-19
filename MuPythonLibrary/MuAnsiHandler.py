@@ -27,7 +27,7 @@
 ##
 import logging
 import re
-import os
+from MuPythonLibrary.UtilityFunctions import GetHostInfo
 try:
     # try to import windows types from winDLL
     import ctypes
@@ -248,7 +248,7 @@ class ColoredStreamHandler(logging.StreamHandler):
 
     def __init__(self, stream=None, strip=None, convert=None):
         logging.StreamHandler.__init__(self, stream)
-        self.on_windows = os.name == 'nt'
+        self.on_windows = GetHostInfo().os == "Windows"
         # We test if the WinAPI works, because even if we are on Windows
         # we may be using a terminal that doesn't support the WinAPI
         # (e.g. Cygwin Terminal). In this case it's up to the terminal
