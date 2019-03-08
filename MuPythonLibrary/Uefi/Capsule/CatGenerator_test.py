@@ -15,9 +15,41 @@ class CatGeneratorTest(unittest.TestCase):
         o = CatGenerator("x64", "10")
         self.assertEqual(o.OperatingSystem, "10")
 
+    def test_10_AU_OS(self):
+        o = CatGenerator("x64", "10_AU")
+        self.assertEqual(o.OperatingSystem, "10_AU")
+
+    def test_10_RS2_OS(self):
+        o = CatGenerator("x64", "10_RS2")
+        self.assertEqual(o.OperatingSystem, "10_RS2")
+
+    def test_10_RS3_OS(self):
+        o = CatGenerator("x64", "10_RS3")
+        self.assertEqual(o.OperatingSystem, "10_RS3")
+
+    def test_10_RS4_OS(self):
+        o = CatGenerator("x64", "10_RS4")
+        self.assertEqual(o.OperatingSystem, "10_RS4")
+
     def test_win10Server_OS(self):
         o = CatGenerator("x64", "Server10")
         self.assertEqual(o.OperatingSystem, "Server10")
+
+    def test_Server2016_OS(self):
+        o = CatGenerator("x64", "Server2016")
+        self.assertEqual(o.OperatingSystem, "Server2016")
+
+    def test_ServerRS2_OS(self):
+        o = CatGenerator("x64", "ServerRS2")
+        self.assertEqual(o.OperatingSystem, "ServerRS2")
+
+    def test_ServerRS3_OS(self):
+        o = CatGenerator("x64", "ServerRS3")
+        self.assertEqual(o.OperatingSystem, "ServerRS3")
+
+    def test_ServerRS4_OS(self):
+        o = CatGenerator("x64", "ServerRS4")
+        self.assertEqual(o.OperatingSystem, "ServerRS4")
 
     def test_invalid_OS(self):
         with self.assertRaises(ValueError):

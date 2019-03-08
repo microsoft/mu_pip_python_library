@@ -4,7 +4,18 @@ from MuPythonLibrary.UtilityFunctions import RunCmd
 
 
 class CatGenerator(object):
-    SUPPORTED_OS = ["win10"]
+    SUPPORTED_OS = {'win10': '10',
+                    '10': '10',
+                    '10_au': '10_AU',
+                    '10_rs2': '10_RS2',
+                    '10_rs3': '10_RS3',
+                    '10_rs4': '10_RS4',
+                    'server10': 'Server10',
+                    'server2016': 'Server2016',
+                    'serverrs2': 'ServerRS2',
+                    'serverrs3': 'ServerRS3',
+                    'serverrs4': 'ServerRS4'
+                    }
 
     def __init__(self, arch, os):
         self.Arch = arch
@@ -33,14 +44,11 @@ class CatGenerator(object):
 
     @OperatingSystem.setter
     def OperatingSystem(self, value):
-        value = value.lower()
-        if(value == "win10") or (value == "10"):
-            self._operatingsystem = "10"
-        elif(value == "server10"):
-            self._operatingsystem = "Server10"
-        else:
-            logging.critical("Unsupported Operating System: %s", value)
+        key = value.lower()
+        if(key not in CatGenerator.SUPPORTED_OS.keys()):
+            logging.critical("Unsupported Operating System: %s", key)
             raise ValueError("Unsupported Operating System")
+        self._operatingsystem = CatGenerator.SUPPORTED_OS[key]
 
     def MakeCat(self, OutputCatFile, PathToInf2CatTool=None):
         # Find Inf2Cat tool

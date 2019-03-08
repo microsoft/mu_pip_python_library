@@ -17,6 +17,13 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.4.4
+-----
+
+Main Changes:
+
+- Add support for newer windows 10 operating systems in CatGenerator script for capsule generation.
+
 0.4.3
 -----
 
