@@ -17,12 +17,13 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
-0.4.4
+0.4.4-dev
 -----
 
 Main Changes:
 
 - Add support for newer windows 10 operating systems in CatGenerator script for capsule generation.
+- Change the color for 'critical' events in the ANSI logging handler to be white (more compatible with PowerShell).
 
 0.4.3
 -----

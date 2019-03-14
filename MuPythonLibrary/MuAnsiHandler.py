@@ -195,7 +195,7 @@ class ColoredFormatter(logging.Formatter):
         'WARNING': AnsiColor.YELLOW,
         'INFO': AnsiColor.CYAN,
         'DEBUG': AnsiColor.BLUE,
-        'CRITICAL': AnsiColor.MAGENTA,
+        'CRITICAL': AnsiColor.LIGHTWHITE_EX,
         'ERROR': AnsiColor.RED,
         "STATUS": AnsiColor.GREEN,
         "PROGRESS": AnsiColor.GREEN,
