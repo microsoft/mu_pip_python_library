@@ -62,7 +62,7 @@ class PropagatingThread(threading.Thread):
 #
 #  http://stackoverflow.com/questions/19423008/logged-subprocess-communicate
 ####
-def reader(filepath, outstream, stream):
+def reader(filepath, outstream, stream, logging_level=logging.INFO):
     f = None
     # open file if caller provided path
     if(filepath):
@@ -78,7 +78,7 @@ def reader(filepath, outstream, stream):
         if(outstream is not None):
             # write to stream object if caller provided object
             outstream.write(s)
-        logging.info(s.rstrip())
+        logging.log(logging_level, s.rstrip())
     stream.close()
     if(f is not None):
         f.close()
@@ -156,7 +156,8 @@ def GetHostInfo():
 #
 # @return returncode of called cmd
 ####
-def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstream=None, environ=None):
+def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstream=None, environ=None,
+           logging_level=logging.INFO, raise_exception_on_nonzero=False):
     cmd = cmd.strip('"\'')
     if " " in cmd:
         cmd = '"' + cmd + '"'
@@ -164,13 +165,13 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
         parameters = parameters.strip()
         cmd += " " + parameters
     starttime = datetime.datetime.now()
-    logging.info("Cmd to run is: " + cmd)
-    logging.info("------------------------------------------------")
-    logging.info("--------------Cmd Output Starting---------------")
-    logging.info("------------------------------------------------")
+    logging.log(logging_level, "Cmd to run is: " + cmd)
+    logging.log(logging_level, "------------------------------------------------")
+    logging.log(logging_level, "--------------Cmd Output Starting---------------")
+    logging.log(logging_level, "------------------------------------------------")
     c = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=workingdir, shell=True, env=environ)
     if(capture):
-        outr = PropagatingThread(target=reader, args=(outfile, outstream, c.stdout,))
+        outr = PropagatingThread(target=reader, args=(outfile, outstream, c.stdout, logging_level))
         outr.start()
         c.wait()
         outr.join()
@@ -179,10 +180,14 @@ def RunCmd(cmd, parameters, capture=True, workingdir=None, outfile=None, outstre
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
-    logging.info("------------------------------------------------")
-    logging.info("--------------Cmd Output Finished---------------")
-    logging.info("--------- Running Time (mm:ss): {0[0]:02}:{0[1]:02} ----------".format(divmod(delta.seconds, 60)))
-    logging.info("------------------------------------------------")
+    endtime_str = "{0[0]:02}:{0[1]:02}".format(divmod(delta.seconds, 60))
+    logging.log(logging_level, "------------------------------------------------")
+    logging.log(logging_level, "--------------Cmd Output Finished---------------")
+    logging.log(logging_level, "--------- Running Time (mm:ss): " + endtime_str + " ----------")
+    logging.log(logging_level, "------------------------------------------------")
+
+    if raise_exception_on_nonzero and c.returncode != 0:
+        raise Exception("{0} failed with error code: {1}".format(cmd, c.returncode))
     return c.returncode
 
 ####
