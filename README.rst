@@ -17,6 +17,13 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.4.5-dev
+-----
+
+Main Changes:
+
+- Add support for parsing FDF's via FdfParser
+
 0.4.4
 -----
 
