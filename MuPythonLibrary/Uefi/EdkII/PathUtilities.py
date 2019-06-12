@@ -109,6 +109,8 @@ class Edk2Path(object):
         return None
 
     def GetAbsolutePathOnThisSytemFromEdk2RelativePath(self, relpath):
+        if relpath is None:
+            return None
         relpath = relpath.replace("/", os.sep)
         abspath = os.path.join(self.WorkspacePath, relpath)
         if os.path.exists(abspath):
