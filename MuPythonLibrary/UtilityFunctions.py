@@ -10,6 +10,7 @@ import re
 import os
 import logging
 import datetime
+import time
 import shutil
 import threading
 import subprocess
@@ -143,6 +144,23 @@ def GetHostInfo():
         raise EnvironmentError("Host info could not be parsed: {0}".format(str(host_info)))
 
     return Host(os=os, arch=arch, bit=bit)
+
+
+####
+# This is a mixing to do timing on a function. Use it like this:
+#
+# @timing
+# def function_i_want_to_time():
+#   ...
+####
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        logging.debug('{:s} function took {:.3f} ms'.format(f.__name__, (time2 - time1) * 1000.0))
+        return ret
+    return wrap
 
 
 ####
