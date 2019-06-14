@@ -6,6 +6,7 @@
 # Copyright Microsoft Corporation, 2017
 ##
 from __future__ import print_function  # support Python3 and 2 for print
+import re
 import os
 import logging
 import datetime
@@ -13,7 +14,9 @@ import shutil
 import threading
 import subprocess
 import sys
+import inspect
 import platform
+import importlib
 from collections import namedtuple
 
 ####
@@ -358,6 +361,54 @@ def PrintByteList(ByteList, IncludeAscii=True, IncludeOffset=True, IncludeHexSep
             print(" %s" % Ascii, end='')
             # print a single newline so that next print will be on new line
         print("")
+
+
+# Simplified Comparison Function borrowed from StackOverflow...
+# https://stackoverflow.com/questions/1714027/version-number-comparison
+# With Python 3.0 help from:
+# https://docs.python.org/3.0/whatsnew/3.0.html#ordering-comparisons
+def version_compare(version1, version2):
+    def normalize(v):
+        return [int(x) for x in re.sub(r'(\.0+)*$', '', v).split(".")]
+    (a, b) = (normalize(version1), normalize(version2))
+    return (a > b) - (a < b)
+
+
+def import_module_by_file_name(module_file_path):
+    ''' Standard method of importing a Python file. Expecting absolute path. '''
+    module_name = os.path.basename(module_file_path)
+    spec = importlib.util.spec_from_file_location(module_name, module_file_path)
+
+    if spec is None:
+        raise RuntimeError(f"Expected module file named {module_file_path}")
+
+    ImportedModule = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ImportedModule)
+
+    return ImportedModule
+
+
+def locate_class_in_module(Module, DesiredClass):
+    '''
+    Given a module and a class, this function will return the subclass of DesiredClass in Module.
+    Throws exception if two classes are found that fit the same criterea.
+    '''
+
+    DesiredClassInstance = None
+    # Pull out the contents of the module that was provided
+    module_contents = dir(Module)
+    # Filter through the Module, we're only looking for classes.
+    classList = [getattr(Module, obj) for obj in module_contents
+                 if inspect.isclass(getattr(Module, obj))]
+    for _class in classList:
+        # Classes that the module import show up in this list too so we need
+        # to make sure it's an INSTANCE of DesiredClass, not DesiredClass itself!
+        if _class is not DesiredClass and issubclass(_class, DesiredClass):
+            if DesiredClassInstance is not None:
+                raise RuntimeError(f"Multiple instances were found:\n\t{DesiredClassInstance}\n\t{_class}")
+            DesiredClassInstance = _class
+
+    return DesiredClassInstance
 
 
 if __name__ == '__main__':

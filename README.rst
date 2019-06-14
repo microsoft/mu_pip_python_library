@@ -16,12 +16,13 @@ Please see Project Mu for details https://microsoft.github.io/mu
 
 Version History
 ===============
-
 0.4.5-dev
 -----
 
 Main Changes:
 
+- Add version_compare to UtilityFunctions, used to compare version strings
+- Adding functionality to import Modules from File and to import Class from Module
 - Add support for parsing FDF's via FdfParser
 
 0.4.4
