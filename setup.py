@@ -26,9 +26,39 @@
 ##
 
 import setuptools
+from setuptools.command.sdist import sdist
+from setuptools.command.install import install
+from setuptools.command.develop import develop
+from MuPythonLibrary.Windows.VsWhereUtilities import _DownloadVsWhere
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
+
+
+class PostSdistCommand(sdist):
+    """Post-sdist."""
+    def run(self):
+        # we need to download vswhere so throw the exception if we don't get it
+        _DownloadVsWhere()
+        sdist.run(self)
+
+
+class PostInstallCommand(install):
+    """Post-install."""
+    def run(self):
+        install.run(self)
+        _DownloadVsWhere()
+
+
+class PostDevCommand(develop):
+    """Post-develop."""
+    def run(self):
+        develop.run(self)
+        try:
+            _DownloadVsWhere()
+        except:
+            pass
+
 
 setuptools.setup(
     name="mu_python_library",
@@ -39,6 +69,11 @@ setuptools.setup(
     url="https://github.com/microsoft/mu_pip_python_library",
     license='BSD2',
     packages=setuptools.find_packages(),
+    cmdclass={
+        'sdist': PostSdistCommand,
+        'install': PostInstallCommand,
+        'develop': PostDevCommand,
+    },
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     classifiers=[

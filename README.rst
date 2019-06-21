@@ -24,6 +24,7 @@ Main Changes:
 - Add version_compare to UtilityFunctions, used to compare version strings
 - Adding functionality to import Modules from File and to import Class from Module
 - Add support for parsing FDF's via FdfParser
+- Added VsWhere embedded in the pip module itself
 
 0.4.4
 -----

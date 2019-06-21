@@ -27,6 +27,7 @@
 import os
 import logging
 from MuPythonLibrary.UtilityFunctions import RunCmd
+from MuPythonLibrary.Windows.VsWhereUtilities import FindToolInWinSdk
 
 
 class CatGenerator(object):
@@ -79,13 +80,7 @@ class CatGenerator(object):
     def MakeCat(self, OutputCatFile, PathToInf2CatTool=None):
         # Find Inf2Cat tool
         if(PathToInf2CatTool is None):
-            PathToInf2CatTool = os.path.join(os.getenv("ProgramFiles(x86)"), "Windows Kits", "10",
-                                             "bin", "x86", "Inf2Cat.exe")
-            if not os.path.exists(PathToInf2CatTool):
-                logging.debug("Windows Kit 10 not Found....trying 8.1")
-                # Try 8.1 kit
-                PathToInf2CatTool.replace("10", "8.1")
-
+            PathToInf2CatTool = FindToolInWinSdk("Inf2Cat.exe")
         # check if exists
         if not os.path.exists(PathToInf2CatTool):
             raise Exception("Can't find Inf2Cat on this machine.  Please install the Windows 10 WDK - "

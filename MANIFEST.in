@@ -4,3 +4,4 @@ exclude *.txt
 exclude .flake8
 exclude .coveragerc
 exclude .gitignore
+include MuPythonLibrary/bin/*.exe

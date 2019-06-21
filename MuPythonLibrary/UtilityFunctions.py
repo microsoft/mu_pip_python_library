@@ -87,33 +87,6 @@ def reader(filepath, outstream, stream, logging_level=logging.INFO):
     if(f is not None):
         f.close()
 
-####
-# Add mono to front of command and resolve full path of exe for mono,
-# Used to add nuget support on posix platforms.
-# https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools
-#
-# @return list containing either ["nuget.exe"] or ["mono", "/PATH/TO/nuget.exe"]
-####
-
-
-def GetNugetCmd():
-    file = "NuGet.exe"
-    cmd = []
-    if (GetHostInfo().os == "Linux"):
-        cmd += ["mono"]
-        found = False
-        for env_var in os.getenv("PATH").split(os.pathsep):
-            env_var = os.path.join(os.path.normpath(env_var), file)
-            if os.path.isfile(env_var):
-                file = '"' + env_var + '"'
-                logging.info("File was found on the path: %s" % file)
-                found = True
-                break
-        if not found:
-            raise Exception("NuGet.exe not found on path")
-    cmd += [file]
-    return cmd
-
 
 ####
 # Returns a namedtuple containing information about host machine.
