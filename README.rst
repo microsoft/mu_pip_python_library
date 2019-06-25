@@ -16,8 +16,19 @@ Please see Project Mu for details https://microsoft.github.io/mu
 
 Version History
 ===============
+
+0.4.6
+-----
+
+Bug Fixes:
+
+- Fix broken download/publish of vswhere.exe in 0.4.5 due to wheel usage.
+
+
 0.4.5
 -----
+
+.. note:: This release is broken for install from WHL file.  Release has been deleted.
 
 Main Changes:
 
