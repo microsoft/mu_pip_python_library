@@ -17,6 +17,17 @@ Please see Project Mu for details https://microsoft.github.io/mu
 Version History
 ===============
 
+0.4.7
+-----
+
+Main Changes:
+
+- Added fallback for finding Vs tools when Visual Studio is not installed.
+
+Bug Fixes:
+
+- Fix error in VsWhereUtilities that prevented capsules from being generated
+
 0.4.6
 -----
 
