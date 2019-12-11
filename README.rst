@@ -1,12 +1,10 @@
 =================
 MU Python Library
 =================
-.. |build_status_windows| image:: https://dev.azure.com/projectmu/mu%20pip/_apis/build/status/PythonLibrary/Mu%20Pip%20Python%20Library%20-%20PR%20Gate%20(Windows)?branchName=master
-.. |build_status_linux| image:: https://dev.azure.com/projectmu/mu%20pip/_apis/build/status/PythonLibrary/Mu%20Pip%20Python%20Library%20-%20PR%20Gate%20(Linux%20-%20Ubuntu%201604)?branchName=master
 
-|build_status_windows| Current build status for master on Windows
+**THIS PROJECT IS NO LONGER ACTIVE** - ACTIVE WORK HAS MOVED TO https://github.com/tianocore/edk2-pytool-library
 
-|build_status_linux| Current build status for master on Linux
+
 
 About
 =====
