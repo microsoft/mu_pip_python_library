@@ -5,6 +5,10 @@
     Branch:         {{mu_pip_python_library.branch}}  
     Commit:         [{{mu_pip_python_library.commit}}]({{mu_pip_python_library.commitlink}})  
     Commit Date:    {{mu_pip_python_library.date}}
+    
+    
+**THIS PROJECT IS NO LONGER ACTIVE** - ACTIVE WORK HAS MOVED TO https://github.com/tianocore/edk2-pytool-library
+----
 
 Python files describing various miscellaneous components from the TPM and EDKII specs.
 
